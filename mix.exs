@@ -4,6 +4,11 @@ defmodule EctoInterface.MixProject do
   def project do
     [
       app: :ecto_interface,
+      description: "A set of common Ecto interfaces generated on the fly with macros",
+      package: %{
+        links: %{"GitHub" => "https://github.com/krainboltgreene/ecto_interface.ex"},
+        licenses: ["Hippocratic-3.0"]
+      },
       version: "1.0.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,

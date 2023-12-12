@@ -26,7 +26,6 @@ end
 
 {:ok, _} = Ecto.Adapters.SQLite3.ensure_all_started(TestRepo.config(), :temporary)
 
-
 # Load up the repository, start it, and run migrations
 _ = Ecto.Adapters.SQLite3.storage_down(TestRepo.config())
 :ok = Ecto.Adapters.SQLite3.storage_up(TestRepo.config())

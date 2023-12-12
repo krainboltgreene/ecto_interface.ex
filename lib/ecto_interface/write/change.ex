@@ -3,7 +3,7 @@ defmodule EctoInterface.Write.Change do
   defmacro __using__([schema, singular, insert_changeset_function, update_changeset_function])
            when is_atom(singular) and is_atom(insert_changeset_function) and
                   is_atom(update_changeset_function) do
-    quote location: :keep do
+    quote(location: :keep) do
       @doc """
       Creates an empty `#{unquote(schema)}` and applies no attributes to it via `#{unquote(schema)}.#{unquote(insert_changeset_function)}/2`
       """

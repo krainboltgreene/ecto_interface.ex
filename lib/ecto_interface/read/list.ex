@@ -13,13 +13,16 @@ defmodule EctoInterface.Read.List do
       @spec unquote(:"list_#{plural}")((Ecto.Query.t() -> Ecto.Query.t())) ::
               list(unquote(schema))
       def unquote(:"list_#{plural}")(subquery) when is_function(subquery, 1),
-        do: subquery.(from(unquote(schema))) |> Application.get_env(:ecto_interface, :default_repo).all()
+        do:
+          subquery.(from(unquote(schema)))
+          |> Application.get_env(:ecto_interface, :default_repo).all()
 
       @doc """
       Returns all `#{unquote(schema)}` records, unsorted
       """
       @spec unquote(:"list_#{plural}")() :: list(unquote(schema).t())
-      def unquote(:"list_#{plural}")(), do: from(unquote(schema)) |> Application.get_env(:ecto_interface, :default_repo).all()
+      def unquote(:"list_#{plural}")(),
+        do: from(unquote(schema)) |> Application.get_env(:ecto_interface, :default_repo).all()
     end
   end
 end

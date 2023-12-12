@@ -47,7 +47,12 @@ defmodule EctoInterfaceTest do
     a = TestRepo.insert!(%Sample{name: "a"})
     _b = TestRepo.insert!(%Sample{name: "b"})
     _c = TestRepo.insert!(%Sample{name: "c"})
-    assert(SampleShorthandContext.list_samples(fn schema -> from(schema, where: [name: "a"]) end) == [a])
+
+    assert(
+      SampleShorthandContext.list_samples(fn schema -> from(schema, where: [name: "a"]) end) == [
+        a
+      ]
+    )
   end
 
   test("count_samples/0") do
@@ -61,6 +66,9 @@ defmodule EctoInterfaceTest do
     _a = TestRepo.insert!(%Sample{name: "a"})
     _b = TestRepo.insert!(%Sample{name: "b"})
     _c = TestRepo.insert!(%Sample{name: "c"})
-    assert(SampleShorthandContext.count_samples(fn schema -> from(schema, where: [name: "a"]) end) == 1)
+
+    assert(
+      SampleShorthandContext.count_samples(fn schema -> from(schema, where: [name: "a"]) end) == 1
+    )
   end
 end

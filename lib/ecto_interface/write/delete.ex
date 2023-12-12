@@ -2,7 +2,7 @@ defmodule EctoInterface.Write.Delete do
   @moduledoc false
   defmacro __using__([schema, singular])
            when is_atom(singular) do
-    quote location: :keep do
+    quote(location: :keep) do
       @doc """
       Takes an `#{unquote(schema)}` and deletes it from the database.
       """

@@ -14,8 +14,8 @@ defmodule EctoInterface.Write.Update do
           when is_struct(record, unquote(schema)) and is_map(attributes),
           do:
             record
-            |> unquote(:"change_#{singular}")(attributes)
             |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
+            |> unquote(:"change_#{singular}")(attributes)
             |> Application.get_env(:ecto_interface, :default_repo).update()
 
       @doc """
@@ -30,8 +30,8 @@ defmodule EctoInterface.Write.Update do
           when is_struct(record, unquote(schema)) and is_map(attributes),
           do:
             record
-            |> unquote(:"change_#{singular}")(attributes)
             |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
+            |> unquote(:"change_#{singular}")(attributes)
             |> Application.get_env(:ecto_interface, :default_repo).update!()
 
       @doc """

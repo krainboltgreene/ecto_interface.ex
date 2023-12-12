@@ -15,8 +15,8 @@ defmodule EctoInterface.Write.Create do
           when is_map(attributes) and is_list(preload),
           do:
             %unquote(schema){}
-            |> unquote(:"new_#{singular}")(attributes)
             |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
+            |> unquote(:"new_#{singular}")(attributes)
             |> Application.get_env(:ecto_interface, :default_repo).insert!()
 
       @doc """
@@ -30,8 +30,8 @@ defmodule EctoInterface.Write.Create do
           when is_map(attributes) and is_list(preload),
           do:
             %unquote(schema){}
-            |> unquote(:"new_#{singular}")(attributes)
             |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
+            |> unquote(:"new_#{singular}")(attributes)
             |> Application.get_env(:ecto_interface, :default_repo).insert()
 
       @doc """

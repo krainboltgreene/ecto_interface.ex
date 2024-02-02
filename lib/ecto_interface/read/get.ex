@@ -10,7 +10,7 @@ defmodule EctoInterface.Read.Get do
       @doc """
       Returns all `#{unquote(schema)}` with the matching primary keys
       """
-      @spec unquote(:"get_#{plural}")(list(String.t())) :: list(unquote(schema).t())
+      @spec unquote(:"get_#{plural}")(list(String.t() | integer())) :: list(unquote(schema).t())
       def unquote(:"get_#{plural}")([]), do: []
 
       def unquote(:"get_#{plural}")(ids),
@@ -28,6 +28,17 @@ defmodule EctoInterface.Read.Get do
           |> Application.get_env(:ecto_interface, :default_repo).one()
 
       @doc """
+      Returns a singular `#{unquote(schema)}` based on a query and primary key, if no record is found it returns `nil`
+      """
+      @spec unquote(:"get_#{singular}")(String.t() | integer, (Ecto.Query.t() -> Ecto.Query.t())) ::
+              unquote(schema).t() | nil
+      def unquote(:"get_#{singular}")(id, subquery)
+          when is_binary(id) or (is_integer(id) and is_function(subquery, 1)),
+          do:
+            subquery.(unquote(schema))
+            |> Application.get_env(:ecto_interface, :default_repo).get(id)
+
+      @doc """
       Returns a singular `#{unquote(schema)}` based on a query and if no record is found it returns `nil`
       """
       @spec unquote(:"get_#{singular}")((Ecto.Query.t() -> Ecto.Query.t())) ::
@@ -37,11 +48,22 @@ defmodule EctoInterface.Read.Get do
           subquery.(unquote(schema)) |> Application.get_env(:ecto_interface, :default_repo).one()
 
       @doc """
-      Returns a singular `#{unquote(schema)}` based on the primary key and if no record is found it returns `nil`
+      Returns a singular `#{unquote(schema)}` based on the primary key and primary key, if no record is found it returns `nil`
       """
-      @spec unquote(:"get_#{singular}")(String.t()) :: unquote(schema).t() | nil
-      def unquote(:"get_#{singular}")(id) when is_binary(id),
+      @spec unquote(:"get_#{singular}")(String.t() | integer) :: unquote(schema).t() | nil
+      def unquote(:"get_#{singular}")(id) when is_binary(id) or is_integer(id),
         do: unquote(schema) |> Application.get_env(:ecto_interface, :default_repo).get(id)
+
+      @doc """
+      Returns a singular `#{unquote(schema)}` based on a query, but if it isn't found will raise an exception
+      """
+      @spec unquote(:"get_#{singular}!")(String.t() | integer, (Ecto.Query.t() -> Ecto.Query.t())) ::
+              unquote(schema).t()
+      def unquote(:"get_#{singular}!")(id, subquery)
+          when is_binary(id) or (is_integer(id) and is_function(subquery, 1)),
+          do:
+            subquery.(unquote(schema))
+            |> Application.get_env(:ecto_interface, :default_repo).get!(id)
 
       @doc """
       Returns a singular `#{unquote(schema)}` based on a query, but if it isn't found will raise an exception
@@ -55,8 +77,8 @@ defmodule EctoInterface.Read.Get do
       @doc """
       Returns a singular `#{unquote(schema)}` based on the primary key, but if it isn't found will raise an exception
       """
-      @spec unquote(:"get_#{singular}!")(String.t()) :: unquote(schema).t()
-      def unquote(:"get_#{singular}!")(id) when is_binary(id),
+      @spec unquote(:"get_#{singular}!")(String.t() | integer) :: unquote(schema).t()
+      def unquote(:"get_#{singular}!")(id) when is_binary(id) or is_integer(id),
         do: unquote(schema) |> Application.get_env(:ecto_interface, :default_repo).get!(id)
     end
   end

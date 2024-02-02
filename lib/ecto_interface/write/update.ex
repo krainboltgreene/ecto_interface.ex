@@ -25,7 +25,8 @@ defmodule EctoInterface.Write.Update do
 
       This function will raise an exception if any validation issues are encountered.
       """
-      @spec unquote(:"update_#{singular}!")(unquote(schema).t(), map(), Keyword.t(list())) :: unquote(schema).t()
+      @spec unquote(:"update_#{singular}!")(unquote(schema).t(), map(), Keyword.t(list())) ::
+              unquote(schema).t()
       def unquote(:"update_#{singular}!")(record, attributes, preload: preload)
           when is_struct(record, unquote(schema)) and is_map(attributes),
           do:

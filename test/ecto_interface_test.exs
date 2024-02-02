@@ -29,6 +29,35 @@ defmodule EctoInterfaceTest do
     use(EctoInterface, [Sample, :samples, :sample])
   end
 
+  test("get_sample/1 with id") do
+    TestRepo.insert!(%Sample{name: "a"})
+    b = TestRepo.insert!(%Sample{name: "b"})
+    TestRepo.insert!(%Sample{name: "c"})
+    assert(b == SampleShorthandContext.get_sample(b.id))
+  end
+
+  test("get_sample/2") do
+    TestRepo.insert!(%Sample{name: "a"})
+    b = TestRepo.insert!(%Sample{name: "b"})
+    TestRepo.insert!(%Sample{name: "c"})
+
+    assert(
+      b ==
+        SampleShorthandContext.get_sample(b.id, fn query -> where(query, [s], s.name == "b") end)
+    )
+  end
+
+  test("get_sample/2 with no match") do
+    TestRepo.insert!(%Sample{name: "a"})
+    b = TestRepo.insert!(%Sample{name: "b"})
+    TestRepo.insert!(%Sample{name: "c"})
+
+    assert(
+      nil ==
+        SampleShorthandContext.get_sample(b.id, fn query -> where(query, [s], s.name == "c") end)
+    )
+  end
+
   test("random_sample/0") do
     a = TestRepo.insert!(%Sample{name: "a"})
     b = TestRepo.insert!(%Sample{name: "b"})
@@ -45,8 +74,8 @@ defmodule EctoInterfaceTest do
 
   test("list_samples/1") do
     a = TestRepo.insert!(%Sample{name: "a"})
-    _b = TestRepo.insert!(%Sample{name: "b"})
-    _c = TestRepo.insert!(%Sample{name: "c"})
+    TestRepo.insert!(%Sample{name: "b"})
+    TestRepo.insert!(%Sample{name: "c"})
 
     assert(
       SampleShorthandContext.list_samples(fn schema -> from(schema, where: [name: "a"]) end) == [
@@ -56,16 +85,16 @@ defmodule EctoInterfaceTest do
   end
 
   test("count_samples/0") do
-    _a = TestRepo.insert!(%Sample{name: "a"})
-    _b = TestRepo.insert!(%Sample{name: "b"})
-    _c = TestRepo.insert!(%Sample{name: "c"})
+    TestRepo.insert!(%Sample{name: "a"})
+    TestRepo.insert!(%Sample{name: "b"})
+    TestRepo.insert!(%Sample{name: "c"})
     assert(SampleShorthandContext.count_samples() == 3)
   end
 
   test("count_samples/1") do
-    _a = TestRepo.insert!(%Sample{name: "a"})
-    _b = TestRepo.insert!(%Sample{name: "b"})
-    _c = TestRepo.insert!(%Sample{name: "c"})
+    TestRepo.insert!(%Sample{name: "a"})
+    TestRepo.insert!(%Sample{name: "b"})
+    TestRepo.insert!(%Sample{name: "c"})
 
     assert(
       SampleShorthandContext.count_samples(fn schema -> from(schema, where: [name: "a"]) end) == 1

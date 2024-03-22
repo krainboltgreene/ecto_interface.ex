@@ -11,6 +11,7 @@ defmodule EctoInterfaceTest do
 
     schema "samples" do
       field(:name, :string)
+      field(:age, :integer)
       timestamps()
     end
 
@@ -21,7 +22,7 @@ defmodule EctoInterfaceTest do
 
     def other_changeset(record, changes) do
       record
-      |> Ecto.Changeset.cast(changes, [:name])
+      |> Ecto.Changeset.cast(changes, [:name, :age])
     end
   end
 
@@ -84,6 +85,45 @@ defmodule EctoInterfaceTest do
     )
   end
 
+  test("stream_samples/0") do
+    TestRepo.insert!(%Sample{name: "a"})
+    TestRepo.insert!(%Sample{name: "b"})
+    TestRepo.insert!(%Sample{name: "c"})
+
+    query =
+      SampleShorthandContext.stream_samples()
+      |> Stream.map(&Map.get(&1, :name))
+
+    TestRepo.transaction(fn ->
+      assert(
+        Enum.to_list(query) == [
+          "a",
+          "b",
+          "c"
+        ]
+      )
+    end)
+  end
+
+  test("stream_samples/1") do
+    TestRepo.insert!(%Sample{name: "a"})
+    TestRepo.insert!(%Sample{name: "b"})
+    TestRepo.insert!(%Sample{name: "c"})
+
+    query =
+      SampleShorthandContext.stream_samples(fn query -> where(query, [x], x.name != ^"a") end)
+      |> Stream.map(&Map.get(&1, :name))
+
+    TestRepo.transaction(fn ->
+      assert(
+        Enum.to_list(query) == [
+          "b",
+          "c"
+        ]
+      )
+    end)
+  end
+
   test("count_samples/0") do
     TestRepo.insert!(%Sample{name: "a"})
     TestRepo.insert!(%Sample{name: "b"})
@@ -99,5 +139,45 @@ defmodule EctoInterfaceTest do
     assert(
       SampleShorthandContext.count_samples(fn schema -> from(schema, where: [name: "a"]) end) == 1
     )
+  end
+
+  test("create_sample/1") do
+    {:ok, a} =
+      SampleShorthandContext.create_sample(%{name: "a", age: 2})
+
+    assert(SampleShorthandContext.random_sample() == a)
+    assert(SampleShorthandContext.random_sample().name == "a")
+    assert(SampleShorthandContext.random_sample().age == nil)
+  end
+
+  test("create_sample/2") do
+    {:ok, a} =
+      SampleShorthandContext.create_sample(&Sample.other_changeset/2, %{name: "a", age: 2})
+
+    assert(SampleShorthandContext.random_sample() == a)
+    assert(SampleShorthandContext.random_sample().name == "a")
+    assert(SampleShorthandContext.random_sample().age == 2)
+  end
+
+  test("update_sample/2") do
+    a = TestRepo.insert!(%Sample{name: "a"})
+
+    {:ok, a} =
+      SampleShorthandContext.update_sample(a, %{name: "b", age: 2})
+
+    assert(SampleShorthandContext.random_sample() == a)
+    assert(SampleShorthandContext.random_sample().name == "b")
+    assert(SampleShorthandContext.random_sample().age == nil)
+  end
+
+  test("update_sample/3") do
+    a = TestRepo.insert!(%Sample{name: "a"})
+
+    {:ok, a} =
+      SampleShorthandContext.update_sample(a, &Sample.other_changeset/2, %{name: "b", age: 2})
+
+    assert(SampleShorthandContext.random_sample() == a)
+    assert(SampleShorthandContext.random_sample().name == "b")
+    assert(SampleShorthandContext.random_sample().age == 2)
   end
 end

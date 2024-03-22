@@ -5,8 +5,6 @@ Application.put_env(:ecto, TestRepo,
   pool: Ecto.Adapters.SQL.Sandbox
 )
 
-Application.put_env(:ecto_interface, :default_repo, TestRepo)
-
 defmodule Ecto.Integration.TestRepo do
   use Ecto.Repo, otp_app: :ecto, adapter: Ecto.Adapters.SQLite3
 

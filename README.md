@@ -11,16 +11,17 @@ and many more.
 
 All you need to do is `use(EctoInterface)` on your context modules:
 
-``` elixir
+```elixir
 defmodule Core.Users do
   use EctoInterface, [Core.Users.Account, :accounts, :account]
 end
 ```
+
 The first argument is the ecto Schema module, the second is the plural name for the record, and finally the singular.
 
 Additionally if you have `slugy` installed you can use:
 
-``` elixir
+```elixir
 defmodule Core.Users do
   use EctoInterface, [Core.Users.Account, :accounts, :account]
   use EctoInterface.Read.Slug, [Core.Users.Account, :account]
@@ -31,8 +32,7 @@ which gives `Core.Users.get_account_by_slug("kurtis-rainbolt-greene")` (the slug
 
 Also, we have a simple interface for tags:
 
-
-``` elixir
+```elixir
 defmodule Core.Users do
   use EctoInterface, [Core.Users.Account, :accounts, :account]
   use EctoInterface.Read.Tagged, [Core.Users.Account, :accounts]
@@ -40,6 +40,17 @@ end
 ```
 
 For useful functions like `Core.Users.list_accounts_with_tags(["friendly", "sporty])`.
+
+Another interface is the `PubSub` interface:
+
+```elixir
+defmodule Core.Users do
+  use EctoInterface, [Core.Users.Account, :accounts, :account]
+  use EctoInterface.Read.PubSub, [Core.Users.Account, :accounts, :account]
+end
+```
+
+For useful functions like `Core.Users.broadcast_account_change(account)` and `Core.Users.subscribe_to_accounts()`.
 
 ## Installation
 
@@ -56,7 +67,7 @@ end
 
 And finally in your `config/config.exs`:
 
-``` elixir
+```elixir
 config :ecto_interface, :default_repo, Core.Repo
 ```
 

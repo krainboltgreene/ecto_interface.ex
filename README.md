@@ -46,7 +46,7 @@ Another interface is the `PubSub` interface:
 ```elixir
 defmodule Core.Users do
   use EctoInterface, [Core.Users.Account, :accounts, :account]
-  use EctoInterface.Read.PubSub, [Core.Users.Account, :accounts, :account]
+  use EctoInterface.PubSub, [Core.Users.Account, :accounts, :account]
 end
 ```
 
@@ -60,7 +60,7 @@ by adding `ecto_interface` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:ecto_interface, "~> 1.0.0"}
+    {:ecto_interface, "~> ..."}
   ]
 end
 ```
@@ -68,7 +68,7 @@ end
 And finally in your `config/config.exs`:
 
 ```elixir
-config :ecto_interface, :default_repo, Core.Repo
+config :ecto_interface, default_repo: Core.Repo, default_pubsub: Core.PubSub
 ```
 
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)

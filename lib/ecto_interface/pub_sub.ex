@@ -1,4 +1,4 @@
-defmodule EctoInterface.Read.PubSub do
+defmodule EctoInterface.PubSub do
   @moduledoc """
   A group of helper methods for broadcasting/listening to data through a pubsub system.
   """

@@ -10,12 +10,14 @@ defmodule EctoInterface.Read.Count do
       @doc """
       Counts the number of `#{unquote(schema)}` records in the databas  based on a set of conditions.
       """
-      @spec unquote(:"count_#{plural}")((Ecto.Query.t() -> Ecto.Query.t())) :: integer()
-      def unquote(:"count_#{plural}")(subquery) when is_function(subquery, 1) do
+      @spec unquote(:"count_#{plural}_by")((Ecto.Query.t() -> Ecto.Query.t())) :: integer()
+      def unquote(:"count_#{plural}_by")(subquery, options \\ [])
+          when is_function(subquery, 1) and is_list(options) do
         Application.get_env(:ecto_interface, :default_repo).aggregate(
-          subquery.(from(unquote(schema))),
+          subquery.(unquote(schema)),
           :count,
-          :id
+          :id,
+          options
         )
       end
 
@@ -23,11 +25,12 @@ defmodule EctoInterface.Read.Count do
       Counts the number of `#{unquote(schema)}` records in the database.
       """
       @spec unquote(:"count_#{plural}")() :: integer()
-      def unquote(:"count_#{plural}")() do
+      def unquote(:"count_#{plural}")(options \\ []) when is_list(options) do
         Application.get_env(:ecto_interface, :default_repo).aggregate(
           unquote(schema),
           :count,
-          :id
+          :id,
+          options
         )
       end
     end

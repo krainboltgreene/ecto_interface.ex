@@ -6,114 +6,76 @@ defmodule EctoInterface.Write.Create do
       @doc """
       Applies a set of `attributes` to a empty `#{unquote(schema)}` via
       `#{unquote(:"new_#{singular}")}/2` and then inserts the changeset into the database. Allows for a list of
-      preloaded relationships.
-
-      This function will raise an exception if any validation issues are encountered.
-      """
-      @spec unquote(:"create_#{singular}!")(map(), Keyword.t(list())) :: unquote(schema).t()
-      def unquote(:"create_#{singular}!")(attributes, preload: preload)
-          when is_map(attributes) and is_list(preload),
-          do:
-            %unquote(schema){}
-            |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
-            |> unquote(:"new_#{singular}")(attributes)
-            |> Application.get_env(:ecto_interface, :default_repo).insert!()
-
-      @doc """
-      Applies a set of `attributes` to a empty `#{unquote(schema)}` via
-      `#{unquote(:"new_#{singular}")}/2`  and then inserts the changeset into the database. Allows for a list of
-      preloaded relationships.
-      """
-      @spec unquote(:"create_#{singular}")(map(), Keyword.t(list())) ::
-              {:ok, unquote(schema).t()} | {:error, Ecto.Changeset.t(unquote(schema).t())}
-      def unquote(:"create_#{singular}")(attributes, preload: preload)
-          when is_map(attributes) and is_list(preload),
-          do:
-            %unquote(schema){}
-            |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
-            |> unquote(:"new_#{singular}")(attributes)
-            |> Application.get_env(:ecto_interface, :default_repo).insert()
-
-      @doc """
-      Applies a set of `attributes` to a empty `#{unquote(schema)}` via
-      `#{unquote(:"new_#{singular}")}/2` and then inserts the changeset into the database.
+      preloaded relationships by passing `preload: []`.
 
       This function will raise an exception if any validation issues are encountered.
       """
       @spec unquote(:"create_#{singular}!")(map()) :: unquote(schema).t()
-      def unquote(:"create_#{singular}!")(attributes \\ %{}) when is_map(attributes),
-        do:
-          %unquote(schema){}
-          |> unquote(:"new_#{singular}")(attributes)
-          |> Application.get_env(:ecto_interface, :default_repo).insert!()
+      def unquote(:"create_#{singular}!")(attributes, options \\ [])
+          when is_map(attributes) do
+        {preload, options} = Keyword.pop(options, :preload, [])
+
+        %unquote(schema){}
+        |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
+        |> unquote(:"new_#{singular}")(attributes)
+        |> Application.get_env(:ecto_interface, :default_repo).insert!(options)
+      end
 
       @doc """
       Applies a set of `attributes` to a empty `#{unquote(schema)}` via
-      `#{unquote(:"new_#{singular}")}/2`  and then inserts the changeset into the database.
+      `#{unquote(:"change_#{singular}")}/2` using `changeset` and then inserts resulting changeset into the database.
+      Allows for a list of preloaded relationships by passing `preload: []`.
+
+      This function will raise an exception if any validation issues are encountered.
+      """
+      @spec unquote(:"create_#{singular}_by!")(map(), function()) ::
+              unquote(schema).t()
+      def unquote(:"create_#{singular}_by!")(attributes, changeset_function, options \\ [])
+          when is_map(attributes) and is_function(changeset_function) do
+        {preload, options} = Keyword.pop(options, :preload, [])
+
+        %unquote(schema){}
+        |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
+        |> unquote(:"change_#{singular}")(
+          attributes,
+          changeset_function
+        )
+        |> Application.get_env(:ecto_interface, :default_repo).insert!(options)
+      end
+
+      @doc """
+      Applies a set of `attributes` to a empty `#{unquote(schema)}` via
+      `#{unquote(:"new_#{singular}")}/2`  and then inserts the changeset into the database. Allows for a list of
+      preloaded relationships by passing `preload: []`.
       """
       @spec unquote(:"create_#{singular}")(map()) ::
               {:ok, unquote(schema).t()} | {:error, Ecto.Changeset.t(unquote(schema).t())}
-      def unquote(:"create_#{singular}")(attributes \\ %{}) when is_map(attributes),
-        do:
-          unquote(:"new_#{singular}")(attributes)
-          |> Application.get_env(:ecto_interface, :default_repo).insert()
+      def unquote(:"create_#{singular}")(attributes, options \\ [])
+          when is_map(attributes) do
+        {preload, options} = Keyword.pop(options, :preload, [])
+
+        %unquote(schema){}
+        |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
+        |> unquote(:"new_#{singular}")(attributes)
+        |> Application.get_env(:ecto_interface, :default_repo).insert(options)
+      end
 
       @doc """
       Applies a set of `attributes` to a empty `#{unquote(schema)}` via
       `#{unquote(:"change_#{singular}")}/2` using `changeset` and then inserts resulting changeset into the database.
-      Allows for a list of preloaded relationships.
-
-      This function will raise an exception if any validation issues are encountered.
+      Allows for a list of preloaded relationships by passing `preload: []`.
       """
-      @spec unquote(:"create_#{singular}!")(function(), map(), Keyword.t(list())) ::
-              unquote(schema).t()
-      def unquote(:"create_#{singular}!")(changeset, attributes, preload: preload)
-          when is_map(attributes) and is_function(changeset) and is_list(preload),
-          do:
-            %unquote(schema){}
-            |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
-            |> unquote(:"change_#{singular}")(changeset, attributes)
-            |> Application.get_env(:ecto_interface, :default_repo).insert!()
-
-      @doc """
-      Applies a set of `attributes` to a empty `#{unquote(schema)}` via
-      `#{unquote(:"change_#{singular}")}/2` using `changeset` and then inserts resulting changeset into the database.
-      Allows for a list of preloaded relationships.
-      """
-      @spec unquote(:"create_#{singular}")(function(), map(), Keyword.t(list())) ::
+      @spec unquote(:"create_#{singular}_by")(map(), function()) ::
               {:ok, unquote(schema).t()} | {:error, Ecto.Changeset.t(unquote(schema).t())}
-      def unquote(:"create_#{singular}")(changeset, attributes, preload: preload)
-          when is_map(attributes) and is_function(changeset) and is_list(preload),
-          do:
-            %unquote(schema){}
-            |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
-            |> unquote(:"change_#{singular}")(changeset, attributes)
-            |> Application.get_env(:ecto_interface, :default_repo).insert()
+      def unquote(:"create_#{singular}_by")(attributes, changeset_function, options \\ [])
+          when is_map(attributes) and is_function(changeset_function) do
+        {preload, options} = Keyword.pop(options, :preload, [])
 
-      @doc """
-      Applies a set of `attributes` to a empty `#{unquote(schema)}` via
-      `#{unquote(:"new_#{singular}")}/2` using `changeset` and then inserts resulting changeset into the database.
-
-      This function will raise an exception if any validation issues are encountered.
-      """
-      @spec unquote(:"create_#{singular}!")(function(), map()) :: unquote(schema).t()
-      def unquote(:"create_#{singular}!")(changeset, attributes)
-          when is_map(attributes) and is_function(changeset),
-          do:
-            unquote(:"new_#{singular}")(changeset, attributes)
-            |> Application.get_env(:ecto_interface, :default_repo).insert!()
-
-      @doc """
-      Applies a set of `attributes` to a empty `#{unquote(schema)}` via
-      `#{unquote(:"new_#{singular}")}/2` using `changeset` and then inserts resulting changeset into the database.
-      """
-      @spec unquote(:"create_#{singular}")(function(), map()) ::
-              {:ok, unquote(schema).t()} | {:error, Ecto.Changeset.t(unquote(schema).t())}
-      def unquote(:"create_#{singular}")(changeset, attributes)
-          when is_map(attributes) and is_function(changeset),
-          do:
-            unquote(:"new_#{singular}")(changeset, attributes)
-            |> Application.get_env(:ecto_interface, :default_repo).insert()
+        %unquote(schema){}
+        |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
+        |> unquote(:"change_#{singular}")(attributes, changeset_function)
+        |> Application.get_env(:ecto_interface, :default_repo).insert(options)
+      end
     end
   end
 end

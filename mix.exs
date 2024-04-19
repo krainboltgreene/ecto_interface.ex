@@ -36,7 +36,7 @@ defmodule EctoInterface.MixProject do
       {:ecto, "~> 3.11"},
       {:slugy, "~> 4.1", optional: true},
       {:ecto_sql, "~> 3.0", only: [:docs, :dev, :test]},
-      {:ecto_sqlite3, "~> 0.12.0", only: [:docs, :dev, :test]},
+      {:ecto_sqlite3, "~> 0.15.1", only: [:docs, :dev, :test]},
       {:postgrex, "~> 0.17.3", optional: true},
       {:credo, "~> 1.7", only: [:docs, :dev, :test]},
       {:ex_doc, "~> 0.30.9", only: [:docs, :dev]},

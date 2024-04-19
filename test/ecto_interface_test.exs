@@ -1,105 +1,175 @@
 defmodule EctoInterfaceTest do
   use ExUnit.Case
-  use Ecto.Integration.Case
+  use EctoInterface.DataCase
+
   doctest EctoInterface
+
   import Ecto.Query
 
-  alias Ecto.Integration.TestRepo
-
-  defmodule Sample do
-    use Ecto.Schema
-
-    schema "samples" do
-      field(:name, :string)
-      field(:age, :integer)
-      timestamps()
-    end
-
-    def changeset(record, changes) do
-      record
-      |> Ecto.Changeset.cast(changes, [:name])
-    end
-
-    def other_changeset(record, changes) do
-      record
-      |> Ecto.Changeset.cast(changes, [:name, :age])
-    end
-  end
-
   defmodule SampleShorthandContext do
-    use(EctoInterface, [Sample, :samples, :sample])
+    use(EctoInterface, [EctoInterface.Customer, :customers, :customer])
   end
 
-  test("get_sample/1 with id") do
-    TestRepo.insert!(%Sample{name: "a"})
-    b = TestRepo.insert!(%Sample{name: "b"})
-    TestRepo.insert!(%Sample{name: "c"})
-    assert(b == SampleShorthandContext.get_sample(b.id))
+  test("get_customer/1 with id") do
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "a",
+      internal_uuid: Ecto.UUID.generate()
+    })
+
+    b =
+      EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+        name: "b",
+        internal_uuid: Ecto.UUID.generate()
+      })
+
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "c",
+      internal_uuid: Ecto.UUID.generate()
+    })
+
+    assert(b == SampleShorthandContext.get_customer(b.id))
   end
 
-  test("get_sample_by/2") do
-    TestRepo.insert!(%Sample{name: "a"})
-    b = TestRepo.insert!(%Sample{name: "b"})
-    TestRepo.insert!(%Sample{name: "c"})
+  test("get_customer_by/2") do
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "a",
+      internal_uuid: Ecto.UUID.generate()
+    })
+
+    b =
+      EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+        name: "b",
+        internal_uuid: Ecto.UUID.generate()
+      })
+
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "c",
+      internal_uuid: Ecto.UUID.generate()
+    })
 
     assert(
       b ==
-        SampleShorthandContext.get_sample_by(b.id, fn query ->
+        SampleShorthandContext.get_customer_by(b.id, fn query ->
           where(query, [s], s.name == "b")
         end)
     )
   end
 
-  test("get_sample_by/2 with no match") do
-    TestRepo.insert!(%Sample{name: "a"})
-    b = TestRepo.insert!(%Sample{name: "b"})
-    TestRepo.insert!(%Sample{name: "c"})
+  test("get_customer_by/2 with no match") do
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "a",
+      internal_uuid: Ecto.UUID.generate()
+    })
+
+    b =
+      EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+        name: "b",
+        internal_uuid: Ecto.UUID.generate()
+      })
+
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "c",
+      internal_uuid: Ecto.UUID.generate()
+    })
 
     assert(
       nil ==
-        SampleShorthandContext.get_sample_by(b.id, fn query ->
+        SampleShorthandContext.get_customer_by(b.id, fn query ->
           where(query, [s], s.name == "c")
         end)
     )
   end
 
-  test("random_sample/0") do
-    a = TestRepo.insert!(%Sample{name: "a"})
-    b = TestRepo.insert!(%Sample{name: "b"})
-    c = TestRepo.insert!(%Sample{name: "c"})
-    assert([a, b, c] |> Enum.member?(SampleShorthandContext.random_sample()))
+  test("random_customer/0") do
+    a =
+      EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+        name: "a",
+        internal_uuid: Ecto.UUID.generate()
+      })
+
+    b =
+      EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+        name: "b",
+        internal_uuid: Ecto.UUID.generate()
+      })
+
+    c =
+      EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+        name: "c",
+        internal_uuid: Ecto.UUID.generate()
+      })
+
+    assert([a, b, c] |> Enum.member?(SampleShorthandContext.random_customer()))
   end
 
-  test("list_samples/0") do
-    a = TestRepo.insert!(%Sample{name: "a"})
-    b = TestRepo.insert!(%Sample{name: "b"})
-    c = TestRepo.insert!(%Sample{name: "c"})
-    assert(SampleShorthandContext.list_samples() == [a, b, c])
+  test("list_customers/0") do
+    a =
+      EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+        name: "a",
+        internal_uuid: Ecto.UUID.generate()
+      })
+
+    b =
+      EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+        name: "b",
+        internal_uuid: Ecto.UUID.generate()
+      })
+
+    c =
+      EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+        name: "c",
+        internal_uuid: Ecto.UUID.generate()
+      })
+
+    assert(SampleShorthandContext.list_customers() == [a, b, c])
   end
 
-  test("list_samples_by/1") do
-    a = TestRepo.insert!(%Sample{name: "a"})
-    TestRepo.insert!(%Sample{name: "b"})
-    TestRepo.insert!(%Sample{name: "c"})
+  test("list_customers_by/1") do
+    a =
+      EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+        name: "a",
+        internal_uuid: Ecto.UUID.generate()
+      })
+
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "b",
+      internal_uuid: Ecto.UUID.generate()
+    })
+
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "c",
+      internal_uuid: Ecto.UUID.generate()
+    })
 
     assert(
-      SampleShorthandContext.list_samples_by(fn schema -> from(schema, where: [name: "a"]) end) ==
+      SampleShorthandContext.list_customers_by(fn schema -> from(schema, where: [name: "a"]) end) ==
         [
           a
         ]
     )
   end
 
-  test("stream_samples/0") do
-    TestRepo.insert!(%Sample{name: "a"})
-    TestRepo.insert!(%Sample{name: "b"})
-    TestRepo.insert!(%Sample{name: "c"})
+  test("stream_customers/0") do
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "a",
+      internal_uuid: Ecto.UUID.generate()
+    })
+
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "b",
+      internal_uuid: Ecto.UUID.generate()
+    })
+
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "c",
+      internal_uuid: Ecto.UUID.generate()
+    })
 
     query =
-      SampleShorthandContext.stream_samples()
+      SampleShorthandContext.stream_customers()
       |> Stream.map(&Map.get(&1, :name))
 
-    TestRepo.transaction(fn ->
+    EctoInterface.TestRepo.transaction(fn ->
       assert(
         Enum.to_list(query) == [
           "a",
@@ -110,16 +180,27 @@ defmodule EctoInterfaceTest do
     end)
   end
 
-  test("stream_samples_by/1") do
-    TestRepo.insert!(%Sample{name: "a"})
-    TestRepo.insert!(%Sample{name: "b"})
-    TestRepo.insert!(%Sample{name: "c"})
+  test("stream_customers_by/1") do
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "a",
+      internal_uuid: Ecto.UUID.generate()
+    })
+
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "b",
+      internal_uuid: Ecto.UUID.generate()
+    })
+
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "c",
+      internal_uuid: Ecto.UUID.generate()
+    })
 
     query =
-      SampleShorthandContext.stream_samples_by(fn query -> where(query, [x], x.name != ^"a") end)
+      SampleShorthandContext.stream_customers_by(fn query -> where(query, [x], x.name != ^"a") end)
       |> Stream.map(&Map.get(&1, :name))
 
-    TestRepo.transaction(fn ->
+    EctoInterface.TestRepo.transaction(fn ->
       assert(
         Enum.to_list(query) == [
           "b",
@@ -129,98 +210,183 @@ defmodule EctoInterfaceTest do
     end)
   end
 
-  test("count_samples/0") do
-    TestRepo.insert!(%Sample{name: "a"})
-    TestRepo.insert!(%Sample{name: "b"})
-    TestRepo.insert!(%Sample{name: "c"})
-    assert(SampleShorthandContext.count_samples() == 3)
+  test("count_customers/0") do
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "a",
+      internal_uuid: Ecto.UUID.generate()
+    })
+
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "b",
+      internal_uuid: Ecto.UUID.generate()
+    })
+
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "c",
+      internal_uuid: Ecto.UUID.generate()
+    })
+
+    assert(SampleShorthandContext.count_customers() == 3)
   end
 
-  test("count_samples_by/1") do
-    TestRepo.insert!(%Sample{name: "a"})
-    TestRepo.insert!(%Sample{name: "b"})
-    TestRepo.insert!(%Sample{name: "c"})
+  test("count_customers_by/1") do
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "a",
+      internal_uuid: Ecto.UUID.generate()
+    })
+
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "b",
+      internal_uuid: Ecto.UUID.generate()
+    })
+
+    EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+      name: "c",
+      internal_uuid: Ecto.UUID.generate()
+    })
 
     assert(
-      SampleShorthandContext.count_samples_by(fn schema -> from(schema, where: [name: "a"]) end) ==
+      SampleShorthandContext.count_customers_by(fn schema -> from(schema, where: [name: "a"]) end) ==
         1
     )
   end
 
-  test("create_sample/1") do
+  test("create_customer/1") do
     {:ok, a} =
-      SampleShorthandContext.create_sample(%{name: "a", age: 2})
+      SampleShorthandContext.create_customer(%{
+        name: "a",
+        age: 2,
+        internal_uuid: Ecto.UUID.generate()
+      })
 
-    assert(SampleShorthandContext.random_sample() == a)
-    assert(SampleShorthandContext.random_sample().name == "a")
-    assert(SampleShorthandContext.random_sample().age == nil)
+    assert(SampleShorthandContext.random_customer() == a)
+    assert(SampleShorthandContext.random_customer().name == "a")
+    assert(SampleShorthandContext.random_customer().age == nil)
   end
 
-  test("create_sample_by/2") do
+  test("create_customer_by/2") do
     {:ok, a} =
-      SampleShorthandContext.create_sample_by(%{name: "a", age: 2}, &Sample.other_changeset/2)
+      SampleShorthandContext.create_customer_by(
+        %{name: "a", age: 2, internal_uuid: Ecto.UUID.generate()},
+        &EctoInterface.Customer.other_changeset/2
+      )
 
-    assert(SampleShorthandContext.random_sample() == a)
-    assert(SampleShorthandContext.random_sample().name == "a")
-    assert(SampleShorthandContext.random_sample().age == 2)
+    assert(SampleShorthandContext.random_customer() == a)
+    assert(SampleShorthandContext.random_customer().name == "a")
+    assert(SampleShorthandContext.random_customer().age == 2)
   end
 
-  test("update_sample/2") do
-    a = TestRepo.insert!(%Sample{name: "a"})
+  test("update_customer/2") do
+    a =
+      EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+        name: "a",
+        internal_uuid: Ecto.UUID.generate()
+      })
 
     {:ok, a} =
-      SampleShorthandContext.update_sample(a, %{name: "b", age: 2})
+      SampleShorthandContext.update_customer(a, %{name: "b", age: 2})
 
-    assert(SampleShorthandContext.random_sample() == a)
-    assert(SampleShorthandContext.random_sample().name == "b")
-    assert(SampleShorthandContext.random_sample().age == nil)
+    assert(SampleShorthandContext.random_customer() == a)
+    assert(SampleShorthandContext.random_customer().name == "b")
+    assert(SampleShorthandContext.random_customer().age == nil)
   end
 
-  test("update_sample_by/3") do
-    a = TestRepo.insert!(%Sample{name: "a"})
+  test("update_customer_by/3") do
+    a =
+      EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+        name: "a",
+        internal_uuid: Ecto.UUID.generate()
+      })
 
     {:ok, a} =
-      SampleShorthandContext.update_sample_by(a, %{name: "b", age: 2}, &Sample.other_changeset/2)
+      SampleShorthandContext.update_customer_by(
+        a,
+        %{name: "b", age: 2},
+        &EctoInterface.Customer.other_changeset/2
+      )
 
-    assert(SampleShorthandContext.random_sample() == a)
-    assert(SampleShorthandContext.random_sample().name == "b")
-    assert(SampleShorthandContext.random_sample().age == 2)
+    assert(SampleShorthandContext.random_customer() == a)
+    assert(SampleShorthandContext.random_customer().name == "b")
+    assert(SampleShorthandContext.random_customer().age == 2)
   end
 
-  test("create_sample!/1") do
-    a = SampleShorthandContext.create_sample!(%{name: "a", age: 2})
+  test("create_customer!/1") do
+    a =
+      SampleShorthandContext.create_customer!(%{
+        name: "a",
+        age: 2,
+        internal_uuid: Ecto.UUID.generate()
+      })
 
-    assert(SampleShorthandContext.random_sample() == a)
-    assert(SampleShorthandContext.random_sample().name == "a")
-    assert(SampleShorthandContext.random_sample().age == nil)
+    assert(SampleShorthandContext.random_customer() == a)
+    assert(SampleShorthandContext.random_customer().name == "a")
+    assert(SampleShorthandContext.random_customer().age == nil)
   end
 
-  test("create_sample_by!/2") do
-    a = SampleShorthandContext.create_sample_by!(%{name: "a", age: 2}, &Sample.other_changeset/2)
+  test("create_customer_by!/2") do
+    a =
+      SampleShorthandContext.create_customer_by!(
+        %{name: "a", age: 2, internal_uuid: Ecto.UUID.generate()},
+        &EctoInterface.Customer.other_changeset/2
+      )
 
-    assert(SampleShorthandContext.random_sample() == a)
-    assert(SampleShorthandContext.random_sample().name == "a")
-    assert(SampleShorthandContext.random_sample().age == 2)
+    assert(SampleShorthandContext.random_customer() == a)
+    assert(SampleShorthandContext.random_customer().name == "a")
+    assert(SampleShorthandContext.random_customer().age == 2)
   end
 
-  test("update_sample!/2") do
-    a = TestRepo.insert!(%Sample{name: "a"})
+  test("update_customer!/2") do
+    a =
+      EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+        name: "a",
+        internal_uuid: Ecto.UUID.generate()
+      })
 
-    a = SampleShorthandContext.update_sample!(a, %{name: "b", age: 2})
+    a = SampleShorthandContext.update_customer!(a, %{name: "b", age: 2})
 
-    assert(SampleShorthandContext.random_sample() == a)
-    assert(SampleShorthandContext.random_sample().name == "b")
-    assert(SampleShorthandContext.random_sample().age == nil)
+    assert(SampleShorthandContext.random_customer() == a)
+    assert(SampleShorthandContext.random_customer().name == "b")
+    assert(SampleShorthandContext.random_customer().age == nil)
   end
 
-  test("update_sample_by!/3") do
-    a = TestRepo.insert!(%Sample{name: "a"})
+  test("update_customer_by!/3") do
+    a =
+      EctoInterface.TestRepo.insert!(%EctoInterface.Customer{
+        name: "a",
+        internal_uuid: Ecto.UUID.generate()
+      })
 
     a =
-      SampleShorthandContext.update_sample_by!(a, %{name: "b", age: 2}, &Sample.other_changeset/2)
+      SampleShorthandContext.update_customer_by!(
+        a,
+        %{name: "b", age: 2},
+        &EctoInterface.Customer.other_changeset/2
+      )
 
-    assert(SampleShorthandContext.random_sample() == a)
-    assert(SampleShorthandContext.random_sample().name == "b")
-    assert(SampleShorthandContext.random_sample().age == 2)
+    assert(SampleShorthandContext.random_customer() == a)
+    assert(SampleShorthandContext.random_customer().name == "b")
+    assert(SampleShorthandContext.random_customer().age == 2)
+  end
+
+  test("new_customer/2") do
+    assert(
+      match?(
+        %Ecto.Changeset{changes: %{name: "a"}},
+        SampleShorthandContext.new_customer(%{name: "a"}, &EctoInterface.Customer.changeset/2)
+      )
+    )
+  end
+
+  test("new_customer/3") do
+    assert(
+      match?(
+        %Ecto.Changeset{changes: %{name: "a"}},
+        SampleShorthandContext.new_customer(
+          %EctoInterface.Customer{},
+          %{name: "a"},
+          &EctoInterface.Customer.changeset/2
+        )
+      )
+    )
   end
 end

@@ -1,0 +1,114 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Elixir ${{ matrix.elixir }} / OTP ${{ matrix.otp }}
+    runs-on: ubuntu-latest
+    needs: check_duplicate_runs
+    if: ${{ needs.check_duplicate_runs.outputs.should_skip != 'true' }}
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: paginator_test
+          POSTGRES_PASSWORD: postgres
+
+    strategy:
+      matrix:
+        elixir:
+          - "1.15"
+          - "1.16"
+        otp:
+          - "24"
+          - "25"
+          - "26"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
+
+      - name: Restore build and deps caches
+        uses: actions/cache@v2
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-deps-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-${{ matrix.otp }}-${{ matrix.elixir }}
+
+      - name: Install package dependencies
+        run: mix deps.get
+
+      - name: Remove compiled application files
+        run: mix clean
+
+      - name: Compile dependencies
+        run: mix compile
+        env:
+          MIX_ENV: test
+
+      - name: Run unit tests
+        run: mix test
+
+  inch:
+    name: Analyse Documentation
+    runs-on: ubuntu-latest
+    needs: test
+
+    strategy:
+      matrix:
+        elixir:
+          - "1.11"
+        otp:
+          - "23.0"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
+
+      - name: Restore build and deps caches
+        uses: actions/cache@v2
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-deps-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-${{ matrix.otp }}-${{ matrix.elixir }}
+
+      - name: Install package dependencies
+        run: mix deps.get
+
+      - name: Remove compiled application files
+        run: mix clean
+
+      - name: Compile dependencies
+        run: mix compile
+
+      - name: Check documentation quality locally
+        run: mix inch
+
+      - name: Report documentation quality
+        if: github.event_name == 'push'
+        run: mix inch.report

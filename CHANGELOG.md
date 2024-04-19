@@ -1,9 +1,16 @@
 # Changelog
 
+## 2.1.0
+
+- [feature] Now includes pagination functionality via `paginated_*/*`, much like `stream_*`. This is incorporated into the library by copying the Paginator code. I wanted to just use the library as normal but it's kinda outdated.
+- [breaking fix] `new_*/1` and `new_*/2` had conflicts, now there is only `new_customer(record, attributes, changeset_function)` and `new_customer(attributes, changeset_function)`
+- [breaking fix] `stream_*_by/2` wasn't actually calling `stream/0`.
+- [fix] Multiple specs are now correctly showing the options variant
+
 ## 2.0.0
 
 - [feature] All functions that can now support the `options` optional argument, which gets passed to `Repo.all/*`, `Repo.one/*`, `Repo.get/*`, `Repo.stream/*`, `Repo.insert/*`, `Repo.update/*`, and `Repo.delete/*`. This is useful for: Timeouts, prefixes, and more.
-- [breaking] All `Read`, `Tagged` and `Slug` functions that previously took `subquery` are now named `_by/`, for example `Core.Users.list_accounts(&where(&1, name: "Kurtis Rainbolt-Greene"))` now becomes `Core.Users.list_accounts(&where_by(&1, name: "Kurtis Rainbolt-Greene"))`.
+- [breaking] All `Read`, `Tagged` and `Slug` functions that previously took `subquery` are now named `_by/`, for example `Core.Users.list_accounts(&where(&1, name: "Kurtis Rainbolt-Greene"))` now becomes `Core.Users.list_accounts_by(&where(&1, name: "Kurtis Rainbolt-Greene"))`.
 - [breaking] All `Write` functions that previously took custom changeset functions are now named `_by/`, for example `Core.Users.create_account(&Core.Users.Account.update_name_changeset/2, %{name: "Kurtis Rainbolt-Greene"})` now becomes `Core.Users.create_account_by(%{name: "Kurtis Rainbolt-Greene"}, &Core.Users.Account.update_name_changeset/2)`.
 - [breaking] I've removed the `get_*_by(Keyword.t())` function because it doesn't make sense given the `subquery` enabled read function.
 - [breaking] I've moved `EctoInterface.Read.PubSub` to `EctoInterface.PubSub` since it has both read/write functions.

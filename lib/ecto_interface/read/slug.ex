@@ -11,6 +11,7 @@ defmodule EctoInterface.Read.Slug do
       Returns a singular `#{unquote(schema)}` based on the slug column, but if it isn't found will raise an exception
       """
       @spec unquote(:"get_#{singular}_by_slug!")(String.t()) :: unquote(schema).t()
+      @spec unquote(:"get_#{singular}_by_slug!")(String.t(), Keyword.t()) :: unquote(schema).t()
       def unquote(:"get_#{singular}_by_slug!")(name_or_slug, options \\ [])
           when is_binary(name_or_slug),
           do:
@@ -22,6 +23,8 @@ defmodule EctoInterface.Read.Slug do
       Returns a singular `#{unquote(schema)}` based on the slug column and if no record is found it returns `nil`
       """
       @spec unquote(:"get_#{singular}_by_slug")(String.t()) :: unquote(schema).t() | nil
+      @spec unquote(:"get_#{singular}_by_slug")(String.t(), Keyword.t()) ::
+              unquote(schema).t() | nil
       def unquote(:"get_#{singular}_by_slug")(name_or_slug, options \\ [])
           when is_binary(name_or_slug),
           do:

@@ -1,6 +1,6 @@
 defmodule EctoInterface.Write.Update do
   @moduledoc false
-  defmacro __using__([schema, singular])
+  defmacro __using__([schema, singular, update_changeset_function])
            when is_atom(singular) do
     quote(location: :keep) do
       @doc """
@@ -18,7 +18,7 @@ defmodule EctoInterface.Write.Update do
 
         record
         |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
-        |> unquote(:"change_#{singular}")(attributes)
+        |> unquote(:"change_#{singular}")(attributes, unquote(update_changeset_function))
         |> Application.get_env(:ecto_interface, :default_repo).update!(options)
       end
 
@@ -64,7 +64,7 @@ defmodule EctoInterface.Write.Update do
 
         record
         |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
-        |> unquote(:"change_#{singular}")(attributes)
+        |> unquote(:"change_#{singular}")(attributes, unquote(update_changeset_function))
         |> Application.get_env(:ecto_interface, :default_repo).update(options)
       end
 

@@ -56,8 +56,8 @@ defmodule EctoInterface do
         unquote(schema),
         unquote(plural),
         unquote(singular),
-        :changeset,
-        :changeset
+        &unquote(schema).changeset/2,
+        &unquote(schema).changeset/2
       ]
     end
   end

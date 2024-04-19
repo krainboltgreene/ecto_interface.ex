@@ -12,6 +12,8 @@ defmodule EctoInterface.Read.Random do
       """
       @spec unquote(:"random_#{singular}_by")((Ecto.Query.t() -> Ecto.Query.t())) ::
               unquote(schema).t() | nil
+      @spec unquote(:"random_#{singular}_by")((Ecto.Query.t() -> Ecto.Query.t()), Keyword.t()) ::
+              unquote(schema).t() | nil
       def unquote(:"random_#{singular}_by")(subquery, options \\ [])
           when is_function(subquery, 1) do
         subquery.(from(unquote(schema)))
@@ -23,6 +25,7 @@ defmodule EctoInterface.Read.Random do
       Randomly selects a `#{unquote(schema)}` record
       """
       @spec unquote(:"random_#{singular}")() :: unquote(schema).t() | nil
+      @spec unquote(:"random_#{singular}")(Keyword.t()) :: unquote(schema).t() | nil
       def unquote(:"random_#{singular}")(options \\ []) do
         unquote(schema)
         |> from(limit: 1, order_by: fragment("random()"))
@@ -33,6 +36,12 @@ defmodule EctoInterface.Read.Random do
       Randomly selects `count` `#{unquote(schema)}` records based on a set of conditions
       """
       @spec unquote(:"random_#{plural}_by")(integer(), (Ecto.Query.t() -> Ecto.Query.t())) ::
+              list(unquote(schema).t())
+      @spec unquote(:"random_#{plural}_by")(
+              integer(),
+              (Ecto.Query.t() -> Ecto.Query.t()),
+              Keyword.t()
+            ) ::
               list(unquote(schema).t())
       def unquote(:"random_#{plural}_by")(count, subquery, options \\ [])
           when is_integer(count) and is_function(subquery, 1) do
@@ -45,6 +54,7 @@ defmodule EctoInterface.Read.Random do
       Randomly selects `count` `#{unquote(schema)}` records.
       """
       @spec unquote(:"random_#{plural}")(integer()) :: list(unquote(schema).t())
+      @spec unquote(:"random_#{plural}")(integer(), Keyword.t()) :: list(unquote(schema).t())
       def unquote(:"random_#{plural}")(count, options \\ []) when is_integer(count) do
         unquote(schema)
         |> from(limit: ^count, order_by: fragment("random()"))

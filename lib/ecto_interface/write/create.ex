@@ -1,11 +1,11 @@
 defmodule EctoInterface.Write.Create do
   @moduledoc false
-  defmacro __using__([schema, singular])
+  defmacro __using__([schema, singular, insert_changeset_function])
            when is_atom(singular) do
     quote(location: :keep) do
       @doc """
       Applies a set of `attributes` to a empty `#{unquote(schema)}` via
-      `#{unquote(:"new_#{singular}")}/2` and then inserts the changeset into the database. Allows for a list of
+      `#{unquote(:"new_#{singular}")}/3` and then inserts the changeset into the database. Allows for a list of
       preloaded relationships by passing `preload: []`.
 
       This function will raise an exception if any validation issues are encountered.
@@ -17,13 +17,13 @@ defmodule EctoInterface.Write.Create do
 
         %unquote(schema){}
         |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
-        |> unquote(:"new_#{singular}")(attributes)
+        |> unquote(:"new_#{singular}")(attributes, unquote(insert_changeset_function))
         |> Application.get_env(:ecto_interface, :default_repo).insert!(options)
       end
 
       @doc """
       Applies a set of `attributes` to a empty `#{unquote(schema)}` via
-      `#{unquote(:"change_#{singular}")}/2` using `changeset` and then inserts resulting changeset into the database.
+      `#{unquote(:"change_#{singular}")}/3` using `changeset` and then inserts resulting changeset into the database.
       Allows for a list of preloaded relationships by passing `preload: []`.
 
       This function will raise an exception if any validation issues are encountered.
@@ -45,7 +45,7 @@ defmodule EctoInterface.Write.Create do
 
       @doc """
       Applies a set of `attributes` to a empty `#{unquote(schema)}` via
-      `#{unquote(:"new_#{singular}")}/2`  and then inserts the changeset into the database. Allows for a list of
+      `#{unquote(:"new_#{singular}")}/3`  and then inserts the changeset into the database. Allows for a list of
       preloaded relationships by passing `preload: []`.
       """
       @spec unquote(:"create_#{singular}")(map()) ::
@@ -56,13 +56,13 @@ defmodule EctoInterface.Write.Create do
 
         %unquote(schema){}
         |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
-        |> unquote(:"new_#{singular}")(attributes)
+        |> unquote(:"new_#{singular}")(attributes, unquote(insert_changeset_function))
         |> Application.get_env(:ecto_interface, :default_repo).insert(options)
       end
 
       @doc """
       Applies a set of `attributes` to a empty `#{unquote(schema)}` via
-      `#{unquote(:"change_#{singular}")}/2` using `changeset` and then inserts resulting changeset into the database.
+      `#{unquote(:"change_#{singular}")}/3` using `changeset` and then inserts resulting changeset into the database.
       Allows for a list of preloaded relationships by passing `preload: []`.
       """
       @spec unquote(:"create_#{singular}_by")(map(), function()) ::

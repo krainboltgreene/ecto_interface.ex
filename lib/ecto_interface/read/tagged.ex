@@ -10,6 +10,8 @@ defmodule EctoInterface.Read.Tagged do
       """
       @spec unquote(:"list_#{plural}_with_tags")(list(String.t())) ::
               list(unquote(schema).t())
+      @spec unquote(:"list_#{plural}_with_tags")(list(String.t()), Keyword.t()) ::
+              list(unquote(schema).t())
       def unquote(:"list_#{plural}_with_tags")([], options \\ []),
         do: []
 

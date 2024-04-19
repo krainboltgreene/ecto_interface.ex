@@ -15,6 +15,12 @@ defmodule EctoInterface.Read.Get do
               (Ecto.Query.t() -> Ecto.Query.t())
             ) ::
               unquote(schema).t() | nil
+      @spec unquote(:"get_#{singular}_by")(
+              String.t() | integer,
+              (Ecto.Query.t() -> Ecto.Query.t()),
+              Keyword.t()
+            ) ::
+              unquote(schema).t() | nil
       def unquote(:"get_#{singular}_by")(id, subquery, options \\ [])
           when (is_binary(id) or is_integer(id)) and is_function(subquery, 1),
           do:
@@ -25,6 +31,8 @@ defmodule EctoInterface.Read.Get do
       Returns a singular `#{unquote(schema)}` based on the primary key and primary key, if no record is found it returns `nil`
       """
       @spec unquote(:"get_#{singular}")(String.t() | integer) :: unquote(schema).t() | nil
+      @spec unquote(:"get_#{singular}")(String.t() | integer, Keyword.t()) ::
+              unquote(schema).t() | nil
       def unquote(:"get_#{singular}")(id, options \\ []) when is_binary(id) or is_integer(id),
         do:
           unquote(schema) |> Application.get_env(:ecto_interface, :default_repo).get(id, options)
@@ -37,6 +45,12 @@ defmodule EctoInterface.Read.Get do
               (Ecto.Query.t() -> Ecto.Query.t())
             ) ::
               unquote(schema).t()
+      @spec unquote(:"get_#{singular}_by!")(
+              String.t() | integer,
+              (Ecto.Query.t() -> Ecto.Query.t()),
+              Keyword.t()
+            ) ::
+              unquote(schema).t()
       def unquote(:"get_#{singular}_by!")(id, subquery, options \\ [])
           when is_binary(id) or (is_integer(id) and is_function(subquery, 1)),
           do:
@@ -47,6 +61,7 @@ defmodule EctoInterface.Read.Get do
       Returns a singular `#{unquote(schema)}` based on the primary key, but if it isn't found will raise an exception
       """
       @spec unquote(:"get_#{singular}!")(String.t() | integer) :: unquote(schema).t()
+      @spec unquote(:"get_#{singular}!")(String.t() | integer, Keyword.t()) :: unquote(schema).t()
       def unquote(:"get_#{singular}!")(id, options \\ []) when is_binary(id) or is_integer(id),
         do:
           unquote(schema) |> Application.get_env(:ecto_interface, :default_repo).get!(id, options)

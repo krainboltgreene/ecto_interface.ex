@@ -11,6 +11,7 @@ defmodule EctoInterface.Write.Create do
       This function will raise an exception if any validation issues are encountered.
       """
       @spec unquote(:"create_#{singular}!")(map()) :: unquote(schema).t()
+      @spec unquote(:"create_#{singular}!")(map(), Keyword.t()) :: unquote(schema).t()
       def unquote(:"create_#{singular}!")(attributes, options \\ [])
           when is_map(attributes) do
         {preload, options} = Keyword.pop(options, :preload, [])
@@ -29,6 +30,8 @@ defmodule EctoInterface.Write.Create do
       This function will raise an exception if any validation issues are encountered.
       """
       @spec unquote(:"create_#{singular}_by!")(map(), function()) ::
+              unquote(schema).t()
+      @spec unquote(:"create_#{singular}_by!")(map(), function(), Keyword.t()) ::
               unquote(schema).t()
       def unquote(:"create_#{singular}_by!")(attributes, changeset_function, options \\ [])
           when is_map(attributes) and is_function(changeset_function) do
@@ -50,6 +53,8 @@ defmodule EctoInterface.Write.Create do
       """
       @spec unquote(:"create_#{singular}")(map()) ::
               {:ok, unquote(schema).t()} | {:error, Ecto.Changeset.t(unquote(schema).t())}
+      @spec unquote(:"create_#{singular}")(map(), Keyword.t()) ::
+              {:ok, unquote(schema).t()} | {:error, Ecto.Changeset.t(unquote(schema).t())}
       def unquote(:"create_#{singular}")(attributes, options \\ [])
           when is_map(attributes) do
         {preload, options} = Keyword.pop(options, :preload, [])
@@ -66,6 +71,8 @@ defmodule EctoInterface.Write.Create do
       Allows for a list of preloaded relationships by passing `preload: []`.
       """
       @spec unquote(:"create_#{singular}_by")(map(), function()) ::
+              {:ok, unquote(schema).t()} | {:error, Ecto.Changeset.t(unquote(schema).t())}
+      @spec unquote(:"create_#{singular}_by")(map(), function(), Keyword.t()) ::
               {:ok, unquote(schema).t()} | {:error, Ecto.Changeset.t(unquote(schema).t())}
       def unquote(:"create_#{singular}_by")(attributes, changeset_function, options \\ [])
           when is_map(attributes) and is_function(changeset_function) do

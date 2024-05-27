@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.0
+
+  - [feature] Improved type annotation for the create functions
+  - [fix] Now you can pass repository options to `paginate_` functions whereas before they were swallowed
+
 ## 2.1.0
 
 - [feature] Now includes pagination functionality via `paginated_*/*`, much like `stream_*`. This is incorporated into the library by copying the Paginator code. I wanted to just use the library as normal but it's kinda outdated.

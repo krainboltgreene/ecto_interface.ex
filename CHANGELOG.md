@@ -1,9 +1,13 @@
 # Changelog
 
+## 2.2.1
+
+- [fix] Relax the requirements of the optional postgrex version
+
 ## 2.2.0
 
-  - [feature] Improved type annotation for the create functions
-  - [fix] Now you can pass repository options to `paginate_` functions whereas before they were swallowed
+- [feature] Improved type annotation for the create functions
+- [fix] Now you can pass repository options to `paginate_` functions whereas before they were swallowed
 
 ## 2.1.0
 

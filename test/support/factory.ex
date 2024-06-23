@@ -1,4 +1,5 @@
 defmodule EctoInterface.Factory do
+  @moduledoc false
   use ExMachina.Ecto, repo: EctoInterface.TestRepo
 
   def customer_factory do

@@ -1,4 +1,5 @@
 defmodule EctoInterface.DataCase do
+  @moduledoc false
   use ExUnit.CaseTemplate
 
   using _opts do

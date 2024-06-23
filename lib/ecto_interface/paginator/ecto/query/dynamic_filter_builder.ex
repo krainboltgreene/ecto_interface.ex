@@ -1,4 +1,5 @@
 defmodule EctoInterface.Paginator.Ecto.Query.DynamicFilterBuilder do
+  @moduledoc false
   @dispatch_table %{
     desc: EctoInterface.Paginator.Ecto.Query.DescNullsFirst,
     desc_nulls_first: EctoInterface.Paginator.Ecto.Query.DescNullsFirst,

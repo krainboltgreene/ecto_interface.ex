@@ -4,26 +4,26 @@ defmodule EctoInterface.Write.Update do
            when is_atom(singular) do
     quote(location: :keep) do
       @doc """
-      Applies a set of `attributes` to the given `record`, a `#{unquote(schema)}`, via
+      Applies a `value` to the given `record`, a `#{unquote(schema)}`, via
       `#{unquote(:"change_#{singular}")}/2`  and then updates with the subsequent changeset. Allows for a
       set of preloaded relationships by passing `preload: []`.
 
       This function will raise an exception if any validation issues are encountered.
       """
-      @spec unquote(:"update_#{singular}!")(unquote(schema).t(), map()) ::
+      @spec unquote(:"update_#{singular}!")(unquote(schema).t(), any()) ::
               unquote(schema).t()
-      def unquote(:"update_#{singular}!")(record, attributes, options \\ [])
-          when is_struct(record, unquote(schema)) and is_map(attributes) do
+      def unquote(:"update_#{singular}!")(record, value, options \\ [])
+          when is_struct(record, unquote(schema)) do
         {preload, options} = Keyword.pop(options, :preload, [])
 
         record
         |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
-        |> unquote(:"change_#{singular}")(attributes, unquote(update_changeset_function))
+        |> unquote(:"change_#{singular}")(value, unquote(update_changeset_function))
         |> Application.get_env(:ecto_interface, :default_repo).update!(options)
       end
 
       @doc """
-      Applies a set of `attributes` to the given `record`, a `#{unquote(schema)}`, via
+      Applies a `value` to the given `record`, a `#{unquote(schema)}`, via
       `#{unquote(:"change_#{singular}")}/2` with the `changeset_function` function, then updates the database with the
       subsequent changeset. Allows for a set of preloaded relationships.
 
@@ -31,62 +31,60 @@ defmodule EctoInterface.Write.Update do
       """
       @spec unquote(:"update_#{singular}_by!")(
               unquote(schema).t(),
-              map(),
+              any(),
               function()
             ) ::
               unquote(schema).t()
       def unquote(:"update_#{singular}_by!")(
             record,
-            attributes,
+            value,
             changeset_function,
             options \\ []
           )
-          when is_struct(record, unquote(schema)) and is_function(changeset_function, 2) and
-                 is_map(attributes) do
+          when is_struct(record, unquote(schema)) and is_function(changeset_function, 2) do
         {preload, options} = Keyword.pop(options, :preload, [])
 
         record
         |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
-        |> unquote(:"change_#{singular}")(attributes, changeset_function)
+        |> unquote(:"change_#{singular}")(value, changeset_function)
         |> Application.get_env(:ecto_interface, :default_repo).update!(options)
       end
 
       @doc """
-      Applies a set of `attributes` to the given `record`, a `#{unquote(schema)}`, via
+      Applies a `value` to the given `record`, a `#{unquote(schema)}`, via
       `#{unquote(:"change_#{singular}")}/2` and then updates with the subsequent changeset. Allows for a
       set of preloaded relationships by passing `preload: []`.
       """
-      @spec unquote(:"update_#{singular}")(unquote(schema).t(), map(), Keyword.t(list())) ::
+      @spec unquote(:"update_#{singular}")(unquote(schema).t(), any(), Keyword.t(list())) ::
               {:ok, unquote(schema).t()} | {:error, Ecto.Changeset.t(unquote(schema).t())}
-      def unquote(:"update_#{singular}")(record, attributes, options \\ [])
-          when is_struct(record, unquote(schema)) and is_map(attributes) do
+      def unquote(:"update_#{singular}")(record, value, options \\ [])
+          when is_struct(record, unquote(schema)) do
         {preload, options} = Keyword.pop(options, :preload, [])
 
         record
         |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
-        |> unquote(:"change_#{singular}")(attributes, unquote(update_changeset_function))
+        |> unquote(:"change_#{singular}")(value, unquote(update_changeset_function))
         |> Application.get_env(:ecto_interface, :default_repo).update(options)
       end
 
       @doc """
-      Applies a set of `attributes` to the given `record`, a `#{unquote(schema)}`, via
+      Applies a `value` to the given `record`, a `#{unquote(schema)}`, via
       `#{unquote(:"change_#{singular}")}/2` with the `changeset_function` function, then updates the database with the
       subsequent changeset. Allows for a set of preloaded relationships.
       """
       @spec unquote(:"update_#{singular}_by")(
               unquote(schema).t(),
-              map(),
+              any(),
               function()
             ) ::
               {:ok, unquote(schema).t()} | {:error, Ecto.Changeset.t(unquote(schema).t())}
-      def unquote(:"update_#{singular}_by")(record, attributes, changeset_function, options \\ [])
-          when is_struct(record, unquote(schema)) and is_function(changeset_function, 2) and
-                 is_map(attributes) do
+      def unquote(:"update_#{singular}_by")(record, value, changeset_function, options \\ [])
+          when is_struct(record, unquote(schema)) and is_function(changeset_function, 2) do
         {preload, options} = Keyword.pop(options, :preload, [])
 
         record
         |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
-        |> unquote(:"change_#{singular}")(attributes, changeset_function)
+        |> unquote(:"change_#{singular}")(value, changeset_function)
         |> Application.get_env(:ecto_interface, :default_repo).update(options)
       end
     end

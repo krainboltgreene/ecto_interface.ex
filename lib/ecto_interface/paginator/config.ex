@@ -1,6 +1,7 @@
 defmodule EctoInterface.Paginator.Config do
-  @moduledoc false
-
+  @moduledoc """
+  The configuration record of a pagination request.
+  """
   @type t :: %__MODULE__{}
 
   defstruct [

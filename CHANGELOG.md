@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.0
+
+- [feature] Prior understandings of Ecto's "changeset" functions were that they took a record and a mapping of attributes. My understanding has grown since then, for example compounding changesets makes sense and also no second (or multiple) arguments. I've at least removed the restriction of it being a map for the second arugment. You can now do: `Core.Users.create_account(:pending)` and it should be compatible.
+
 ## 2.2.1
 
 - [fix] Relax the requirements of the optional postgrex version

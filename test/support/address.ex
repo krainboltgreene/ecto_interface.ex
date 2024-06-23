@@ -1,4 +1,5 @@
 defmodule EctoInterface.Address do
+  @moduledoc false
   use Ecto.Schema
 
   @primary_key {:city, :string, autogenerate: false}

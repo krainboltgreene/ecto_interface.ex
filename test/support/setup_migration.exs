@@ -1,4 +1,5 @@
 defmodule EctoInterface.SetupMigration do
+  @moduledoc false
   use Ecto.Migration
 
   def change do

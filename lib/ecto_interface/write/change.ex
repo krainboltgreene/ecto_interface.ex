@@ -8,18 +8,18 @@ defmodule EctoInterface.Write.Change do
       """
       @spec unquote(:"new_#{singular}")(unquote(schema).t(), any(), function()) ::
               Ecto.Changeset.t(unquote(schema).t())
-      def unquote(:"new_#{singular}")(record, attributes, changeset_function)
-          when is_map(attributes) and is_function(changeset_function),
-          do: changeset_function.(record, attributes)
+      def unquote(:"new_#{singular}")(record, value, changeset_function)
+          when is_function(changeset_function),
+          do: changeset_function.(record, value)
 
       @doc """
       Creates an empty `#{unquote(schema)}` and applies the `value` to it via the `changeset_function` function given
       """
       @spec unquote(:"new_#{singular}")(any(), function()) ::
               Ecto.Changeset.t(unquote(schema).t())
-      def unquote(:"new_#{singular}")(attributes, changeset_function)
-          when is_map(attributes) and is_function(changeset_function),
-          do: changeset_function.(%unquote(schema){}, attributes)
+      def unquote(:"new_#{singular}")(value, changeset_function)
+          when is_function(changeset_function),
+          do: changeset_function.(%unquote(schema){}, value)
 
       @doc """
       Takes a `#{unquote(schema)}` and applies the `value` to it via the `changeset_function` function given. The `value` can be anything that the `changeset_function` takes.
@@ -30,10 +30,10 @@ defmodule EctoInterface.Write.Change do
               function()
             ) ::
               Ecto.Changeset.t(unquote(schema).t())
-      def unquote(:"change_#{singular}")(record, attributes, changeset_function)
-          when is_struct(record, unquote(schema)) and is_map(attributes) and
+      def unquote(:"change_#{singular}")(record, value, changeset_function)
+          when is_struct(record, unquote(schema)) and
                  is_function(changeset_function),
-          do: changeset_function.(record, attributes)
+          do: changeset_function.(record, value)
     end
   end
 end

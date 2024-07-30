@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.0
+
+- [breaking] [feature] Now when you pass preloads to `create` or `update` it will then preload after the insert/update as well.
+
 ## 2.3.1
 
 - [bug] Both `change_#{singular}` and `new_#{singular}` were incorrectly still enforcing a `map()` type for the value.

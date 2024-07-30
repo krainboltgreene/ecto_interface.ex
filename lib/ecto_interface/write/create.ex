@@ -19,6 +19,7 @@ defmodule EctoInterface.Write.Create do
         |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
         |> unquote(:"new_#{singular}")(value, unquote(insert_changeset_function))
         |> Application.get_env(:ecto_interface, :default_repo).insert!(options)
+        |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
       end
 
       @doc """
@@ -43,6 +44,7 @@ defmodule EctoInterface.Write.Create do
           changeset_function
         )
         |> Application.get_env(:ecto_interface, :default_repo).insert!(options)
+        |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
       end
 
       @doc """
@@ -61,6 +63,13 @@ defmodule EctoInterface.Write.Create do
         |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
         |> unquote(:"new_#{singular}")(value, unquote(insert_changeset_function))
         |> Application.get_env(:ecto_interface, :default_repo).insert(options)
+        |> case do
+          {:ok, record} ->
+            {:ok, Application.get_env(:ecto_interface, :default_repo).preload(record, preload)}
+
+          otherwise ->
+            otherwise
+        end
       end
 
       @doc """
@@ -80,6 +89,13 @@ defmodule EctoInterface.Write.Create do
         |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
         |> unquote(:"change_#{singular}")(value, changeset_function)
         |> Application.get_env(:ecto_interface, :default_repo).insert(options)
+        |> case do
+          {:ok, record} ->
+            {:ok, Application.get_env(:ecto_interface, :default_repo).preload(record, preload)}
+
+          otherwise ->
+            otherwise
+        end
       end
     end
   end

@@ -22,7 +22,7 @@ defmodule EctoInterface.Read.Tagged do
           having: fragment("? @> ?", fragment("array_agg(?)", tag.slug), ^tags),
           group_by: record.id
         )
-        |> Application.get_env(:ecto_interface, :default_repo).all(options)
+        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).all(options)
       end
     end
   end

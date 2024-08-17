@@ -18,7 +18,7 @@ defmodule EctoInterface.Read.Random do
           when is_function(subquery, 1) do
         subquery.(from(unquote(schema)))
         |> from(limit: 1, order_by: fragment("random()"))
-        |> Application.get_env(:ecto_interface, :default_repo).one()
+        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).one()
       end
 
       @doc """
@@ -29,7 +29,7 @@ defmodule EctoInterface.Read.Random do
       def unquote(:"random_#{singular}")(options \\ []) do
         unquote(schema)
         |> from(limit: 1, order_by: fragment("random()"))
-        |> Application.get_env(:ecto_interface, :default_repo).one()
+        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).one()
       end
 
       @doc """
@@ -47,7 +47,7 @@ defmodule EctoInterface.Read.Random do
           when is_integer(count) and is_function(subquery, 1) do
         subquery.(from(unquote(schema)))
         |> from(limit: ^count, order_by: fragment("random()"))
-        |> Application.get_env(:ecto_interface, :default_repo).all(options)
+        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).all(options)
       end
 
       @doc """
@@ -58,7 +58,7 @@ defmodule EctoInterface.Read.Random do
       def unquote(:"random_#{plural}")(count, options \\ []) when is_integer(count) do
         unquote(schema)
         |> from(limit: ^count, order_by: fragment("random()"))
-        |> Application.get_env(:ecto_interface, :default_repo).all(options)
+        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).all(options)
       end
     end
   end

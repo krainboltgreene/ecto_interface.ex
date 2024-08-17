@@ -15,7 +15,7 @@ defmodule EctoInterface.Read.Count do
               integer()
       def unquote(:"count_#{plural}_by")(subquery, options \\ [])
           when is_function(subquery, 1) and is_list(options) do
-        Application.get_env(:ecto_interface, :default_repo).aggregate(
+        Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).aggregate(
           subquery.(unquote(schema)),
           :count,
           :id,
@@ -29,7 +29,7 @@ defmodule EctoInterface.Read.Count do
       @spec unquote(:"count_#{plural}")() :: integer()
       @spec unquote(:"count_#{plural}")(Keyword.t()) :: integer()
       def unquote(:"count_#{plural}")(options \\ []) when is_list(options) do
-        Application.get_env(:ecto_interface, :default_repo).aggregate(
+        Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).aggregate(
           unquote(schema),
           :count,
           :id,

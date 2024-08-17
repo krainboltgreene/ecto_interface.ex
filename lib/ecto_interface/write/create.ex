@@ -16,10 +16,10 @@ defmodule EctoInterface.Write.Create do
         {preload, options} = Keyword.pop(options, :preload, [])
 
         %unquote(schema){}
-        |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
+        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).preload(preload)
         |> unquote(:"new_#{singular}")(value, unquote(insert_changeset_function))
-        |> Application.get_env(:ecto_interface, :default_repo).insert!(options)
-        |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
+        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).insert!(options)
+        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).preload(preload)
       end
 
       @doc """
@@ -38,13 +38,13 @@ defmodule EctoInterface.Write.Create do
         {preload, options} = Keyword.pop(options, :preload, [])
 
         %unquote(schema){}
-        |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
+        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).preload(preload)
         |> unquote(:"change_#{singular}")(
           value,
           changeset_function
         )
-        |> Application.get_env(:ecto_interface, :default_repo).insert!(options)
-        |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
+        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).insert!(options)
+        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).preload(preload)
       end
 
       @doc """
@@ -60,12 +60,12 @@ defmodule EctoInterface.Write.Create do
         {preload, options} = Keyword.pop(options, :preload, [])
 
         %unquote(schema){}
-        |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
+        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).preload(preload)
         |> unquote(:"new_#{singular}")(value, unquote(insert_changeset_function))
-        |> Application.get_env(:ecto_interface, :default_repo).insert(options)
+        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).insert(options)
         |> case do
           {:ok, record} ->
-            {:ok, Application.get_env(:ecto_interface, :default_repo).preload(record, preload)}
+            {:ok, Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).preload(record, preload)}
 
           otherwise ->
             otherwise
@@ -86,12 +86,12 @@ defmodule EctoInterface.Write.Create do
         {preload, options} = Keyword.pop(options, :preload, [])
 
         %unquote(schema){}
-        |> Application.get_env(:ecto_interface, :default_repo).preload(preload)
+        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).preload(preload)
         |> unquote(:"change_#{singular}")(value, changeset_function)
-        |> Application.get_env(:ecto_interface, :default_repo).insert(options)
+        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).insert(options)
         |> case do
           {:ok, record} ->
-            {:ok, Application.get_env(:ecto_interface, :default_repo).preload(record, preload)}
+            {:ok, Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).preload(record, preload)}
 
           otherwise ->
             otherwise

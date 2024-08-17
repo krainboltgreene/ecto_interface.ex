@@ -10,7 +10,7 @@ defmodule EctoInterface.Write.Delete do
               {:ok, unquote(schema).t()} | {:error, Ecto.Changeset.t(unquote(schema).t())}
       def unquote(:"delete_#{singular}")(record, options \\ [])
           when is_struct(record, unquote(schema)),
-          do: record |> Application.get_env(:ecto_interface, :default_repo).delete(options)
+          do: record |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).delete(options)
 
       @doc """
       Takes an `#{unquote(schema)}` and deletes it from the database.
@@ -20,7 +20,7 @@ defmodule EctoInterface.Write.Delete do
       @spec unquote(:"delete_#{singular}!")(unquote(schema).t()) :: unquote(schema).t()
       def unquote(:"delete_#{singular}!")(record, options \\ [])
           when is_struct(record, unquote(schema)),
-          do: record |> Application.get_env(:ecto_interface, :default_repo).delete!(options)
+          do: record |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).delete!(options)
     end
   end
 end

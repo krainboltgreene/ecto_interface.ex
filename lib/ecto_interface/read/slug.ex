@@ -17,7 +17,7 @@ defmodule EctoInterface.Read.Slug do
           do:
             unquote(schema)
             |> from(where: [slug: ^Slugy.slugify(name_or_slug)], limit: 1)
-            |> Application.get_env(:ecto_interface, :default_repo).one!(options)
+            |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).one!(options)
 
       @doc """
       Returns a singular `#{unquote(schema)}` based on the slug column and if no record is found it returns `nil`
@@ -30,7 +30,7 @@ defmodule EctoInterface.Read.Slug do
           do:
             unquote(schema)
             |> from(where: [slug: ^Slugy.slugify(name_or_slug)], limit: 1)
-            |> Application.get_env(:ecto_interface, :default_repo).one(options)
+            |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).one(options)
     end
   end
 end

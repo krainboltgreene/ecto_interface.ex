@@ -25,7 +25,7 @@ defmodule EctoInterface.Read.Get do
           when (is_binary(id) or is_integer(id)) and is_function(subquery, 1),
           do:
             subquery.(unquote(schema))
-            |> Application.get_env(:ecto_interface, :default_repo).get(id, options)
+            |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).get(id, options)
 
       @doc """
       Returns a singular `#{unquote(schema)}` based on the primary key and primary key, if no record is found it returns `nil`
@@ -35,7 +35,7 @@ defmodule EctoInterface.Read.Get do
               unquote(schema).t() | nil
       def unquote(:"get_#{singular}")(id, options \\ []) when is_binary(id) or is_integer(id),
         do:
-          unquote(schema) |> Application.get_env(:ecto_interface, :default_repo).get(id, options)
+          unquote(schema) |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).get(id, options)
 
       @doc """
       Returns a singular `#{unquote(schema)}` based on a query, but if it isn't found will raise an exception
@@ -55,7 +55,7 @@ defmodule EctoInterface.Read.Get do
           when is_binary(id) or (is_integer(id) and is_function(subquery, 1)),
           do:
             subquery.(unquote(schema))
-            |> Application.get_env(:ecto_interface, :default_repo).get!(id, options)
+            |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).get!(id, options)
 
       @doc """
       Returns a singular `#{unquote(schema)}` based on the primary key, but if it isn't found will raise an exception
@@ -64,7 +64,7 @@ defmodule EctoInterface.Read.Get do
       @spec unquote(:"get_#{singular}!")(String.t() | integer, Keyword.t()) :: unquote(schema).t()
       def unquote(:"get_#{singular}!")(id, options \\ []) when is_binary(id) or is_integer(id),
         do:
-          unquote(schema) |> Application.get_env(:ecto_interface, :default_repo).get!(id, options)
+          unquote(schema) |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).get!(id, options)
     end
   end
 end

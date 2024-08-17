@@ -18,7 +18,7 @@ defmodule EctoInterface.Read.List do
           when is_function(subquery, 1) and is_list(options),
           do:
             subquery.(from(unquote(schema)))
-            |> Application.get_env(:ecto_interface, :default_repo).all(options)
+            |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).all(options)
 
       @doc """
       Returns all `#{unquote(schema)}` records, unsorted
@@ -28,7 +28,7 @@ defmodule EctoInterface.Read.List do
       def unquote(:"list_#{plural}")(options \\ []) when is_list(options),
         do:
           from(unquote(schema))
-          |> Application.get_env(:ecto_interface, :default_repo).all(options)
+          |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).all(options)
 
       @doc """
       Returns a stream of `#{unquote(schema)}` records from a modified query
@@ -41,7 +41,7 @@ defmodule EctoInterface.Read.List do
           when is_function(subquery, 1) and is_list(options),
           do:
             subquery.(from(unquote(schema)))
-            |> Application.get_env(:ecto_interface, :default_repo).stream(options)
+            |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).stream(options)
 
       @doc """
       Returns a stream of `#{unquote(schema)}` records, unsorted
@@ -51,7 +51,7 @@ defmodule EctoInterface.Read.List do
       def unquote(:"stream_#{plural}")(options \\ []) when is_list(options),
         do:
           from(unquote(schema))
-          |> Application.get_env(:ecto_interface, :default_repo).stream(options)
+          |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).stream(options)
 
       @doc """
       Returns a stream of `#{unquote(schema)}` records from a modified query. There are two optional arguments: The first is the
@@ -79,7 +79,7 @@ defmodule EctoInterface.Read.List do
             unquote(schema)
             |> from()
             |> subquery.()
-            |> Application.get_env(:ecto_interface, :default_repo).paginate(
+            |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).paginate(
               pagination_options,
               repository_options
             )
@@ -97,7 +97,7 @@ defmodule EctoInterface.Read.List do
           do:
             unquote(schema)
             |> from()
-            |> Application.get_env(:ecto_interface, :default_repo).paginate(
+            |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).paginate(
               pagination_options,
               repository_options
             )

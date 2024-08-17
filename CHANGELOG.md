@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.0
+
+- [feature] Allow a per-configuration per-module definition for repo in addition to the default repo.
+
 ## 3.0.0
 
 - [breaking] [feature] Now when you pass preloads to `create` or `update` it will then preload after the insert/update as well.

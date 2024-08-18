@@ -7,7 +7,35 @@ defmodule EctoInterfaceTest do
   import Ecto.Query
 
   defmodule SampleShorthandContext do
-    use(EctoInterface, [EctoInterface.Customer, :customers, :customer])
+    use(EctoInterface, source: EctoInterface.Customer, plural: :customers, singular: :customer)
+
+    use(EctoInterface,
+      source: EctoInterface.Customer,
+      plural: :customersa,
+      singular: :customera,
+      repo: EctoInterface.TestRepo
+    )
+
+    use(EctoInterface,
+      source: EctoInterface.Customer,
+      plural: :customersb,
+      singular: :customerb,
+      pubsub: Core.PubSub
+    )
+
+    use(EctoInterface,
+      source: EctoInterface.Customer,
+      plural: :customersc,
+      singular: :customerc,
+      tagged: :tags
+    )
+
+    use(EctoInterface,
+      source: EctoInterface.Customer,
+      plural: :customersd,
+      singular: :customerd,
+      slug: :slurg
+    )
   end
 
   test("get_customer/1 with id") do
@@ -366,27 +394,5 @@ defmodule EctoInterfaceTest do
     assert(SampleShorthandContext.random_customer() == a)
     assert(SampleShorthandContext.random_customer().name == "b")
     assert(SampleShorthandContext.random_customer().age == 2)
-  end
-
-  test("new_customer/2") do
-    assert(
-      match?(
-        %Ecto.Changeset{changes: %{name: "a"}},
-        SampleShorthandContext.new_customer(%{name: "a"}, &EctoInterface.Customer.changeset/2)
-      )
-    )
-  end
-
-  test("new_customer/3") do
-    assert(
-      match?(
-        %Ecto.Changeset{changes: %{name: "a"}},
-        SampleShorthandContext.new_customer(
-          %EctoInterface.Customer{},
-          %{name: "a"},
-          &EctoInterface.Customer.changeset/2
-        )
-      )
-    )
   end
 end

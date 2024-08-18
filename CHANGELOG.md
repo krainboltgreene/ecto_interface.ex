@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.0.0
+
+- [breaking] Removing `new_*` and `change_*` as they stopped fitting once I added the `create_*_by` type functionality. You should just use your changesets.
+- [breaking] Removing insert/update changeset function options and instead either default to `changeset/2` or whatever you pass to `*_*_by`.
+- [breaking] [feature] Refactored the options for the `use(EctoInterface)` calls to use keywords because we want to be able to pass in repo on a per-definintion basis. This is especially useful for multi-database applications.
+- [feature] Instead of calling `use(EctoInterface.Pubsub)` seperately you can now pass `pubsub: Core.PubSub`, `tagged: :tags`, and `slug: :username` respectively to setup those three extensions.
+
 ## 3.1.0
 
 - [feature] Allow a per-configuration per-module definition for repo in addition to the default repo.

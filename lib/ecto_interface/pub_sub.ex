@@ -2,8 +2,28 @@ defmodule EctoInterface.PubSub do
   @moduledoc """
   A group of helper methods for broadcasting/listening to data through a pubsub system.
   """
-  defmacro __using__([schema, plural, singular])
-           when is_atom(singular) and is_atom(plural) do
+  defmacro __using__(options)
+           when is_list(options) do
+    source =
+      Keyword.get(options, :source) ||
+        raise "Missing :source key in use(EctoInterface.Pubsub) call"
+
+    plural =
+      Keyword.get(options, :plural) ||
+        raise "Missing :plural key in use(EctoInterface.Pubsub) call"
+
+    singular =
+      Keyword.get(options, :singular) ||
+        raise "Missing :singular key in use(EctoInterface.Pubsub) call"
+
+    pubsub =
+      Keyword.get(
+        options,
+        :pubsub,
+        Application.get_env(:ecto_interface, :default_pubsub, false)
+      ) ||
+        raise "Missing :pubsub key in use(EctoInterface.Pubsub) call OR missing :default_pubsub configuration"
+
     quote(location: :keep) do
       @doc """
       Subscribes to the various #{unquote(singular)} messages.
@@ -11,17 +31,17 @@ defmodule EctoInterface.PubSub do
       @spec unquote(:"subscribe_to_#{plural}")() :: :ok
       def unquote(:"subscribe_to_#{plural}")(),
         do:
-          Application.get_env(:ecto_interface, :default_pubsub)
+          unquote(pubsub)
           |> Phoenix.PubSub.subscribe(Enum.join([__MODULE__, unquote(plural)], "/"))
 
       @doc """
       Broadcasts an insert of the specified `record` to anyone who is listening. The event payload name
       is `:changed` and the payload is `{:#{unquote(singular)}, id}`.
       """
-      @spec unquote(:"broadcast_#{plural}_insert")(unquote(schema).t()) :: :ok | {:error, term()}
-      def unquote(:"broadcast_#{plural}_insert")(%unquote(schema){id: id}),
+      @spec unquote(:"broadcast_#{plural}_insert")(unquote(source).t()) :: :ok | {:error, term()}
+      def unquote(:"broadcast_#{plural}_insert")(%unquote(source){id: id}),
         do:
-          Application.get_env(:ecto_interface, :default_pubsub)
+          unquote(pubsub)
           |> Phoenix.PubSub.broadcast(
             Enum.join([__MODULE__, unquote(plural)], "/"),
             {:inserted, {unquote(singular), id}}
@@ -31,10 +51,10 @@ defmodule EctoInterface.PubSub do
       Broadcasts a change of the specified `record` to anyone who is listening. The event payload name
       is `:changed` and the payload is `{:#{unquote(singular)}, id}`.
       """
-      @spec unquote(:"broadcast_#{plural}_change")(unquote(schema).t()) :: :ok | {:error, term()}
-      def unquote(:"broadcast_#{plural}_change")(%unquote(schema){id: id}),
+      @spec unquote(:"broadcast_#{plural}_change")(unquote(source).t()) :: :ok | {:error, term()}
+      def unquote(:"broadcast_#{plural}_change")(%unquote(source){id: id}),
         do:
-          Application.get_env(:ecto_interface, :default_pubsub)
+          unquote(pubsub)
           |> Phoenix.PubSub.broadcast(
             Enum.join([__MODULE__, unquote(plural)], "/"),
             {:changed, {unquote(singular), id}}

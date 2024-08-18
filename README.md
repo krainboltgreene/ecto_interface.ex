@@ -1,6 +1,6 @@
 # EctoInterface
 
-Creates a common set of interface APIs for ecto models. Some examples include:
+Creates a common set of interface APIs for ecto-based models. By including this functionality you can get a lot of free functionality, including (but not limited to):
 
 - `list_.../0` returns all records for a schema
 - `get_.../1` returns a singular record by it's primary key
@@ -13,7 +13,7 @@ All you need to do is `use(EctoInterface)` on your context modules:
 
 ```elixir
 defmodule Core.Users do
-  use EctoInterface, [Core.Users.Account, :accounts, :account]
+  use EctoInterface, source: Core.Users.Account, plural: :accounts, singular: :account
 end
 ```
 
@@ -23,8 +23,7 @@ Additionally if you have `slugy` installed you can use:
 
 ```elixir
 defmodule Core.Users do
-  use EctoInterface, [Core.Users.Account, :accounts, :account]
-  use EctoInterface.Read.Slug, [Core.Users.Account, :account]
+  use EctoInterface, source: Core.Users.Account, plural: :accounts, singular: :account, slug: :username
 end
 ```
 
@@ -34,8 +33,7 @@ Also, we have a simple interface for tags:
 
 ```elixir
 defmodule Core.Users do
-  use EctoInterface, [Core.Users.Account, :accounts, :account]
-  use EctoInterface.Read.Tagged, [Core.Users.Account, :accounts]
+  use EctoInterface, source: Core.Users.Account, plural: :accounts, singular: :account, tagged: :tags
 end
 ```
 
@@ -45,8 +43,7 @@ Another interface is the `PubSub` interface:
 
 ```elixir
 defmodule Core.Users do
-  use EctoInterface, [Core.Users.Account, :accounts, :account]
-  use EctoInterface.PubSub, [Core.Users.Account, :accounts, :account]
+  use EctoInterface, source: Core.Users.Account, plural: :accounts, singular: :account, pubsub: true
 end
 ```
 

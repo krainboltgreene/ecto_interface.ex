@@ -1,71 +1,80 @@
 defmodule EctoInterface.Write.Create do
   @moduledoc false
-  defmacro __using__([schema, singular, insert_changeset_function])
-           when is_atom(singular) do
+  defmacro __using__(options) when is_list(options) do
+    source =
+      Keyword.get(options, :source) ||
+        raise "Missing :source key in use(EctoInterface) call"
+
+    singular =
+      Keyword.get(options, :singular) ||
+        raise "Missing :singular key in use(EctoInterface) call"
+
+    repo =
+      Keyword.get(
+        options,
+        :repo,
+        Application.get_env(:ecto_interface, :default_repo)
+      ) ||
+        raise "Missing :repo key in use(EctoInterface) call OR missing :default_repo in configuration"
+
     quote(location: :keep) do
       @doc """
-      Applies a `value` to a empty `#{unquote(schema)}` via
-      `#{unquote(:"new_#{singular}")}/3` and then inserts the changeset into the database. Allows for a list of
+      Applies a `value` to a empty `#{unquote(source)}` via `#{unquote(source)}.changeset/2` and then inserts the changeset into the database. Allows for a list of
       preloaded relationships by passing `preload: []`.
 
       This function will raise an exception if any validation issues are encountered.
       """
-      @spec unquote(:"create_#{singular}!")(any()) :: unquote(schema).t()
-      @spec unquote(:"create_#{singular}!")(any(), Keyword.t()) :: unquote(schema).t()
+      @spec unquote(:"create_#{singular}!")(any()) :: unquote(source).t()
+      @spec unquote(:"create_#{singular}!")(any(), Keyword.t()) :: unquote(source).t()
       def unquote(:"create_#{singular}!")(value, options \\ []) do
         {preload, options} = Keyword.pop(options, :preload, [])
 
-        %unquote(schema){}
-        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).preload(preload)
-        |> unquote(:"new_#{singular}")(value, unquote(insert_changeset_function))
-        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).insert!(options)
-        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).preload(preload)
+        %unquote(source){}
+        |> unquote(repo).preload(preload)
+        |> unquote(source).changeset(value)
+        |> unquote(repo).insert!(options)
+        |> unquote(repo).preload(preload)
       end
 
       @doc """
-      Applies a `value` to a empty `#{unquote(schema)}` via
-      `#{unquote(:"change_#{singular}")}/3` using `changeset` and then inserts resulting changeset into the database.
+      Applies a `value` to a empty `#{unquote(source)}` using `changeset` and then inserts resulting changeset into the database.
       Allows for a list of preloaded relationships by passing `preload: []`.
 
       This function will raise an exception if any validation issues are encountered.
       """
       @spec unquote(:"create_#{singular}_by!")(any(), function()) ::
-              unquote(schema).t()
+              unquote(source).t()
       @spec unquote(:"create_#{singular}_by!")(any(), function(), Keyword.t()) ::
-              unquote(schema).t()
+              unquote(source).t()
       def unquote(:"create_#{singular}_by!")(value, changeset_function, options \\ [])
           when is_function(changeset_function) do
         {preload, options} = Keyword.pop(options, :preload, [])
 
-        %unquote(schema){}
-        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).preload(preload)
-        |> unquote(:"change_#{singular}")(
-          value,
-          changeset_function
-        )
-        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).insert!(options)
-        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).preload(preload)
+        %unquote(source){}
+        |> unquote(repo).preload(preload)
+        |> changeset_function.(value)
+        |> unquote(repo).insert!(options)
+        |> unquote(repo).preload(preload)
       end
 
       @doc """
-      Applies a `value` to a empty `#{unquote(schema)}` via
-      `#{unquote(:"new_#{singular}")}/3`  and then inserts the changeset into the database. Allows for a list of
+      Applies a `value` to a empty `#{unquote(source)}` via `#{unquote(source)}.changeset/2` and then inserts the changeset into the database. Allows for a list of
       preloaded relationships by passing `preload: []`.
       """
       @spec unquote(:"create_#{singular}")(any()) ::
-              {:ok, unquote(schema).t()} | {:error, Ecto.Changeset.t(unquote(schema).t())}
+              {:ok, unquote(source).t()} | {:error, Ecto.Changeset.t(unquote(source).t())}
       @spec unquote(:"create_#{singular}")(any(), Keyword.t()) ::
-              {:ok, unquote(schema).t()} | {:error, Ecto.Changeset.t(unquote(schema).t())}
+              {:ok, unquote(source).t()} | {:error, Ecto.Changeset.t(unquote(source).t())}
       def unquote(:"create_#{singular}")(value, options \\ []) do
         {preload, options} = Keyword.pop(options, :preload, [])
 
-        %unquote(schema){}
-        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).preload(preload)
-        |> unquote(:"new_#{singular}")(value, unquote(insert_changeset_function))
-        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).insert(options)
+        %unquote(source){}
+        |> unquote(repo).preload(preload)
+        |> unquote(source).changeset(value)
+        |> unquote(repo).insert(options)
         |> case do
           {:ok, record} ->
-            {:ok, Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).preload(record, preload)}
+            {:ok, unquote(repo).preload(record, preload)}
 
           otherwise ->
             otherwise
@@ -73,25 +82,24 @@ defmodule EctoInterface.Write.Create do
       end
 
       @doc """
-      Applies a `value` to a empty `#{unquote(schema)}` via
-      `#{unquote(:"change_#{singular}")}/3` using `changeset` and then inserts resulting changeset into the database.
+      Applies a `value` to a empty `#{unquote(source)}` using `changeset` and then inserts resulting changeset into the database.
       Allows for a list of preloaded relationships by passing `preload: []`.
       """
       @spec unquote(:"create_#{singular}_by")(any(), function()) ::
-              {:ok, unquote(schema).t()} | {:error, Ecto.Changeset.t(unquote(schema).t())}
+              {:ok, unquote(source).t()} | {:error, Ecto.Changeset.t(unquote(source).t())}
       @spec unquote(:"create_#{singular}_by")(any(), function(), Keyword.t()) ::
-              {:ok, unquote(schema).t()} | {:error, Ecto.Changeset.t(unquote(schema).t())}
+              {:ok, unquote(source).t()} | {:error, Ecto.Changeset.t(unquote(source).t())}
       def unquote(:"create_#{singular}_by")(value, changeset_function, options \\ [])
           when is_function(changeset_function) do
         {preload, options} = Keyword.pop(options, :preload, [])
 
-        %unquote(schema){}
-        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).preload(preload)
-        |> unquote(:"change_#{singular}")(value, changeset_function)
-        |> Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).insert(options)
+        %unquote(source){}
+        |> unquote(repo).preload(preload)
+        |> changeset_function.(value)
+        |> unquote(repo).insert(options)
         |> case do
           {:ok, record} ->
-            {:ok, Application.get_env(:ecto_interface, unquote(schema), Application.get_env(:ecto_interface, :default_repo)).preload(record, preload)}
+            {:ok, unquote(repo).preload(record, preload)}
 
           otherwise ->
             otherwise

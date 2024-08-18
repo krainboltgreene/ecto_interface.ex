@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.1
+
+- [fix] If a module didn't define a changeset/2 then you would get a compilation warning, now you get a runtime warning.
+
 ## 4.0.0
 
 - [breaking] Removing `new_*` and `change_*` as they stopped fitting once I added the `create_*_by` type functionality. You should just use your changesets.
@@ -17,7 +21,7 @@
 
 ## 2.3.1
 
-- [bug] Both `change_#{singular}` and `new_#{singular}` were incorrectly still enforcing a `map()` type for the value.
+- [fix] Both `change_#{singular}` and `new_#{singular}` were incorrectly still enforcing a `map()` type for the value.
 
 ## 2.3.0
 

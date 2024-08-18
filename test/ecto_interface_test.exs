@@ -17,6 +17,12 @@ defmodule EctoInterfaceTest do
     )
 
     use(EctoInterface,
+      source: EctoInterface.Address,
+      plural: :addresses,
+      singular: :address
+    )
+
+    use(EctoInterface,
       source: EctoInterface.Customer,
       plural: :customersb,
       singular: :customerb,

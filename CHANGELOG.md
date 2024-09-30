@@ -1,5 +1,27 @@
 # Changelog
 
+## 4.1.0
+
+- [feature] Now you can subscribe and broadcast to specific tenant keys and/or primary keys (Detailed below)
+
+```elixir
+# For the below examples `charge.id == 1` and `charge.merchant_slug == :johns_tackle_shop`.
+
+# This will subscribe to a topic with the id given, ie: `App.Transactions/charges:1`
+App.Transactions.subscribe_to_charge(charge.id)
+
+# And to broadcast:
+App.Transactions.broadcast_charges_insert(charge.id)
+App.Transactions.broadcast_charges_change(charge.id)
+
+# You can also subscribe to charges with a specific set of options
+App.Transactions.subscribe_to_charges(tenant: charge.merchant_slug)
+App.Transactions.subscribe_to_charges(tenant: charge.merchant_slug, prefix: "sandbox")
+
+# This will publish a message of `{:changed, {:charges, 1}}` to `App.Transactions/charges:1` and `App.Transactions/charges/merchant_slug:johns_tackle_shop`
+App.Transactions.broadcast_charges_change(charge.id, tenant: charge.merchant_slug, prefix: "sandbox")
+```
+
 ## 4.0.1
 
 - [fix] If a module didn't define a changeset/2 then you would get a compilation warning, now you get a runtime warning.

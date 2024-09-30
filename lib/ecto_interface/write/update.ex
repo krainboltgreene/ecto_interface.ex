@@ -32,7 +32,7 @@ defmodule EctoInterface.Write.Update do
 
         record
         |> unquote(repo).preload(preload)
-        |> (& apply(unquote(source), :changeset, [&1, value])).()
+        |> (&apply(unquote(source), :changeset, [&1, value])).()
         |> unquote(repo).update!(options)
         |> unquote(repo).preload(preload)
       end
@@ -77,7 +77,7 @@ defmodule EctoInterface.Write.Update do
 
         record
         |> unquote(repo).preload(preload)
-        |> (& apply(unquote(source), :changeset, [&1, value])).()
+        |> (&apply(unquote(source), :changeset, [&1, value])).()
         |> unquote(repo).update(options)
         |> case do
           {:ok, record} ->

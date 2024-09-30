@@ -93,7 +93,6 @@ defmodule EctoInterface do
       if pubsub do
         quote do
           use EctoInterface.PubSub,
-            source: unquote(source),
             plural: unquote(plural),
             singular: unquote(singular),
             pubsub: unquote(pubsub)

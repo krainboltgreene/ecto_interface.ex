@@ -73,7 +73,7 @@ defmodule EctoInterface.PubSub do
 
       And broadcast via:
 
-        MyApp.Transactions.broadcast_charges_insert(charge)
+        MyApp.Transactions.broadcast_charges_insert(charge.id)
 
       However if you want to pub/sub to a specific record:
 
@@ -87,7 +87,7 @@ defmodule EctoInterface.PubSub do
 
       And to the broadcast:
 
-          MyApp.Transactions.broadcast_charges_insert(charge, prefix: "live", tenant: charge.merchant.slug)
+          MyApp.Transactions.broadcast_charges_insert(charge.id, prefix: "live", tenant: charge.merchant.slug)
 
       You have to change your listener signature:
 
@@ -178,7 +178,7 @@ defmodule EctoInterface.PubSub do
         if Keyword.keyword?(options) && Enum.any?(options) do
           Phoenix.PubSub.broadcast(
             unquote(pubsub),
-            "#{__MODULE__}/#{unquote(singular)}/#{inspect(options)}",
+            "#{__MODULE__}/#{unquote(singular)}:#{key}/#{inspect(options)}",
             {:changed, {unquote(singular), key, options}}
           )
 

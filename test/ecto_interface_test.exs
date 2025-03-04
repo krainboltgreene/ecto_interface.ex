@@ -231,7 +231,9 @@ defmodule EctoInterfaceTest do
     })
 
     query =
-      SampleShorthandContext.stream_customers_by(fn query -> where(query, [x], x.name != ^"a") end)
+      SampleShorthandContext.stream_customers_by(fn query ->
+        where(query, [x], x.name != ^"a")
+      end)
       |> Stream.map(&Map.get(&1, :name))
 
     EctoInterface.TestRepo.transaction(fn ->

@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.1
+
+- [bug] The subscription channel for an individual item change with options and the broadcast of the same parameters weren't the same. I've now corrected them.
+
 ## 4.1.0
 
 - [feature] Now you can subscribe and broadcast to specific tenant keys and/or primary keys (Detailed below)

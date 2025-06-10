@@ -20,11 +20,11 @@ defmodule EctoInterface.Read.Count do
       ) ||
         raise "Missing :repo key in use(EctoInterface) call OR missing :default_repo in configuration"
 
-    quote(location: :keep) do
+    quote do
       import Ecto.Query
 
       @doc """
-      Counts the number of `#{unquote(source)}` records in the databas  based on a set of conditions.
+      Counts the number of `#{unquote(source)}` records in the databas e based on a set of conditions.
       """
       @spec unquote(:"count_#{plural}_by")((Ecto.Query.t() -> Ecto.Query.t())) :: integer()
       @spec unquote(:"count_#{plural}_by")((Ecto.Query.t() -> Ecto.Query.t()), Keyword.t()) ::

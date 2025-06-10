@@ -26,7 +26,7 @@ defmodule EctoInterface.Read do
     slug = Keyword.get(options, :slug, false)
     tagged = Keyword.get(options, :tagged, false)
 
-    quote(location: :keep) do
+    quote do
       use EctoInterface.Read.Count,
         source: unquote(source),
         plural: unquote(plural),

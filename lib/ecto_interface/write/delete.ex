@@ -17,7 +17,7 @@ defmodule EctoInterface.Write.Delete do
       ) ||
         raise "Missing :repo key in use(EctoInterface) call OR missing :default_repo in configuration"
 
-    quote(location: :keep) do
+    quote do
       @doc """
       Takes an `#{unquote(source)}` and deletes it from the database.
       """

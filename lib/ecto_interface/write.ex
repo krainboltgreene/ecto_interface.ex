@@ -18,7 +18,7 @@ defmodule EctoInterface.Write do
       ) ||
         raise "Missing :repo key in use(EctoInterface) call OR missing :default_repo in configuration"
 
-    quote(location: :keep) do
+    quote do
       use EctoInterface.Write.Create,
         source: unquote(source),
         singular: unquote(singular),

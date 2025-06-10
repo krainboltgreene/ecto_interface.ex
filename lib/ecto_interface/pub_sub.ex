@@ -20,7 +20,7 @@ defmodule EctoInterface.PubSub do
       ) ||
         raise "Missing :pubsub key in use(EctoInterface.Pubsub) call OR missing :default_pubsub configuration"
 
-    quote(location: :keep) do
+    quote do
       @doc """
       Subscribes to any messages broadcast to the #{__MODULE__}/#{unquote(singular)} channel.
       """
@@ -65,7 +65,7 @@ defmodule EctoInterface.PubSub do
 
       For example lets say you subscribe with:
 
-          MyApp.Transactions.subscribe_to_charges()
+          #{__MODULE__}.subscribe_to_charges()
 
       You can then define the listener:
 
@@ -73,21 +73,21 @@ defmodule EctoInterface.PubSub do
 
       And broadcast via:
 
-        MyApp.Transactions.broadcast_charges_insert(charge.id)
+        #{__MODULE__}.broadcast_charges_insert(charge.id)
 
       However if you want to pub/sub to a specific record:
 
-          MyApp.Transactions.subscribe_to_charge(charge.id)
+          #{__MODULE__}.subscribe_to_charge(charge.id)
 
       The same listener will work.
 
       However if you want to narrow further you can pass a `options` keyword to the subscribe:
 
-          MyApp.Transactions.subscribe_to_charges(prefix: "live", tenant: :johnny_tackle_shop)
+          #{__MODULE__}.subscribe_to_charges(prefix: "live", tenant: :johnny_tackle_shop)
 
       And to the broadcast:
 
-          MyApp.Transactions.broadcast_charges_insert(charge.id, prefix: "live", tenant: charge.merchant.slug)
+          #{__MODULE__}.broadcast_charges_insert(charge.id, prefix: "live", tenant: charge.merchant.slug)
 
       You have to change your listener signature:
 
@@ -95,7 +95,7 @@ defmodule EctoInterface.PubSub do
 
       NOTE: The following subscription will also pick up the above broadcast, but obviously won't have the options:
 
-          MyApp.Transactions.subscribe_to_charge(charge.id)
+          #{__MODULE__}.subscribe_to_charge(charge.id)
       """
       @spec unquote(:"broadcast_#{plural}_insert")(atom() | integer() | String.t(), atom()) ::
               :ok | {:error, term()}
@@ -138,7 +138,7 @@ defmodule EctoInterface.PubSub do
 
       For example lets say you subscribe with:
 
-          MyApp.Transactions.subscribe_to_charges()
+          #{__MODULE__}.subscribe_to_charges()
 
       You can then define the listener:
 
@@ -146,21 +146,21 @@ defmodule EctoInterface.PubSub do
 
       And broadcast via:
 
-        MyApp.Transactions.broadcast_charges_change(charge)
+        #{__MODULE__}.broadcast_charges_change(charge)
 
       However if you want to pub/sub to a specific record:
 
-          MyApp.Transactions.subscribe_to_charge(charge.id)
+          #{__MODULE__}.subscribe_to_charge(charge.id)
 
       The same listener will work.
 
       However if you want to narrow further you can pass a `options` keyword to the subscribe:
 
-          MyApp.Transactions.subscribe_to_charges(prefix: "live", tenant: :johnny_tackle_shop)
+          #{__MODULE__}.subscribe_to_charges(prefix: "live", tenant: :johnny_tackle_shop)
 
       And to the broadcast:
 
-          MyApp.Transactions.broadcast_charges_change(charge, prefix: "live", tenant: charge.merchant.slug)
+          #{__MODULE__}.broadcast_charges_change(charge, prefix: "live", tenant: charge.merchant.slug)
 
       You have to change your listener signature:
 
@@ -168,7 +168,7 @@ defmodule EctoInterface.PubSub do
 
       NOTE: The following subscription will also pick up the above broadcast, but obviously won't have the options:
 
-          MyApp.Transactions.subscribe_to_charge(charge.id)
+          #{__MODULE__}.subscribe_to_charge(charge.id)
       """
       @spec unquote(:"broadcast_#{plural}_change")(
               atom() | integer() | String.t(),

@@ -17,7 +17,7 @@ defmodule EctoInterface.Write.Create do
       ) ||
         raise "Missing :repo key in use(EctoInterface) call OR missing :default_repo in configuration"
 
-    quote(location: :keep) do
+    quote do
       @doc """
       Applies a `value` to a empty `#{unquote(source)}` via `#{unquote(source)}.changeset/2` and then inserts the changeset into the database. Allows for a list of
       preloaded relationships by passing `preload: []`.

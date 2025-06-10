@@ -20,7 +20,7 @@ defmodule EctoInterface.Read.List do
       ) ||
         raise "Missing :repo key in use(EctoInterface) call OR missing :default_repo in configuration"
 
-    quote(location: :keep) do
+    quote do
       import Ecto.Query
 
       @doc """

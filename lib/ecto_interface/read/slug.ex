@@ -24,7 +24,7 @@ defmodule EctoInterface.Read.Slug do
       Keyword.get(options, :slug) ||
         raise "Missing :slug key in use(EctoInterface) call"
 
-    quote(location: :keep) do
+    quote do
       import Ecto.Query
 
       @doc """

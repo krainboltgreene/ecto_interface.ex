@@ -22,7 +22,7 @@ defmodule EctoInterface.Read.Tagged do
       Keyword.get(options, :tagged) ||
         raise "Missing :tagged key in use(EctoInterface) call"
 
-    quote(location: :keep) do
+    quote do
       import Ecto.Query
 
       @doc """

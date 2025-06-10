@@ -24,7 +24,7 @@ defmodule EctoInterface.Read.Random do
       ) ||
         raise "Missing :repo key in use(EctoInterface) call OR missing :default_repo in configuration"
 
-    quote(location: :keep) do
+    quote do
       import Ecto.Query
 
       @doc """
@@ -38,7 +38,7 @@ defmodule EctoInterface.Read.Random do
           when is_function(subquery, 1) do
         subquery.(from(unquote(source)))
         |> from(limit: 1, order_by: fragment("random()"))
-        |> unquote(repo).one()
+        |> unquote(repo).one(options)
       end
 
       @doc """
@@ -49,7 +49,7 @@ defmodule EctoInterface.Read.Random do
       def unquote(:"random_#{singular}")(options \\ []) do
         unquote(source)
         |> from(limit: 1, order_by: fragment("random()"))
-        |> unquote(repo).one()
+        |> unquote(repo).one(options)
       end
 
       @doc """

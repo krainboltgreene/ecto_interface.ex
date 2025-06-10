@@ -52,7 +52,7 @@ defmodule EctoInterface do
     tagged = Keyword.get(options, :tagged, false)
 
     [
-      quote(location: :keep) do
+      quote do
         use EctoInterface.Read.Count,
           source: unquote(source),
           plural: unquote(plural),

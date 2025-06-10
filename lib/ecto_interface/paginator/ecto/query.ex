@@ -128,33 +128,35 @@ defmodule EctoInterface.Paginator.Ecto.Query do
   # Without named binding we assume position of binding is 0
   defp column_position(_query, column), do: {0, column}
 
-  #  In order to return the correct pagination cursors, we need to fetch one more
-  # # record than we actually want to return.
+  # In order to return the correct pagination cursors, we need to fetch one more
+  # record than we actually want to return.
   defp query_limit(%EctoInterface.Paginator.Config{limit: limit}) do
     limit + 1
   end
 
-  # This code was taken from https://github.com/elixir-ecto/ecto/blob/v2.1.4/lib/ecto/query.ex#L1212-L1226
-  defp reverse_order_bys(query) do
-    update_in(query.order_bys, fn
-      [] ->
-        []
+  def get_reverse_order_bys([]), do: []
 
-      order_bys ->
-        for %{expr: expr} = order_by <- order_bys do
-          %{
-            order_by
-            | expr:
-                Enum.map(expr, fn
-                  {:desc, ast} -> {:asc, ast}
-                  {:desc_nulls_first, ast} -> {:asc_nulls_last, ast}
-                  {:desc_nulls_last, ast} -> {:asc_nulls_first, ast}
-                  {:asc, ast} -> {:desc, ast}
-                  {:asc_nulls_last, ast} -> {:desc_nulls_first, ast}
-                  {:asc_nulls_first, ast} -> {:desc_nulls_last, ast}
-                end)
-          }
-        end
-    end)
+  # This code was taken from https://github.com/elixir-ecto/ecto/blob/v2.1.4/lib/ecto/query.ex#L1212-L1226
+  def get_reverse_order_bys(order_bys) when is_list(order_bys) do
+    for(%{expr: expr} = order_by <- order_bys) do
+      %{
+        order_by
+        | expr:
+            Enum.map(expr, fn
+              {:desc, ast} -> {:asc, ast}
+              {:desc_nulls_first, ast} -> {:asc_nulls_last, ast}
+              {:desc_nulls_last, ast} -> {:asc_nulls_first, ast}
+              {:asc, ast} -> {:desc, ast}
+              {:asc_nulls_last, ast} -> {:desc_nulls_first, ast}
+              {:asc_nulls_first, ast} -> {:desc_nulls_last, ast}
+            end)
+      }
+    end
   end
+
+  def get_reverse_order_bys(%{order_bys: []}), do: []
+  def get_reverse_order_bys(%{order_bys: order_bys}), do: get_reverse_order_bys(order_bys)
+
+  # This code was taken from https://github.com/elixir-ecto/ecto/blob/v2.1.4/lib/ecto/query.ex#L1212-L1226
+  defp reverse_order_bys(query), do: update_in(query.order_bys, &get_reverse_order_bys/1)
 end

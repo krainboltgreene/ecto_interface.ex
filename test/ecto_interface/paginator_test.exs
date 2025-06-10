@@ -776,13 +776,12 @@ defmodule EctoInterface.PaginatorTest do
 
   describe "with include_total_count" do
     test "when set to :infinity", %{
-      payments: {_p1, _p2, _p3, _p4, p5, _p6, _p7, _p8, _p9, _p10, _p11, _p12}
+      payments: {_p1, _p2, _p3, _p4, p5, _p6, _p7, _p8, _p9, p10, _p11, _p12}
     } do
       %EctoInterface.Paginator.Page{metadata: metadata} =
-        payments_by_customer_name()
+        from(p in EctoInterface.Payment)
         |> EctoInterface.TestRepo.paginate(
           cursor_fields: [:id],
-          sort_direction: :asc,
           limit: 5,
           total_count_limit: :infinity,
           include_total_count: true
@@ -790,31 +789,34 @@ defmodule EctoInterface.PaginatorTest do
 
       assert metadata == %EctoInterface.Paginator.PageMetadata{
                after: encode_cursor(%{id: p5.id}),
+               last_page_after: encode_cursor(%{id: p10.id}),
                before: nil,
                limit: 5,
                total_count: 12,
-               total_count_cap_exceeded: false
+               total_count_cap_exceeded: false,
+               total_pages: 3
              }
     end
 
     test "when cap not exceeded", %{
-      payments: {_p1, _p2, _p3, _p4, p5, _p6, _p7, _p8, _p9, _p10, _p11, _p12}
+      payments: {_p1, _p2, _p3, _p4, p5, _p6, _p7, _p8, _p9, p10, _p11, _p12}
     } do
       %EctoInterface.Paginator.Page{metadata: metadata} =
-        payments_by_customer_name()
+        from(p in EctoInterface.Payment)
         |> EctoInterface.TestRepo.paginate(
           cursor_fields: [:id],
-          sort_direction: :asc,
           limit: 5,
           include_total_count: true
         )
 
       assert metadata == %EctoInterface.Paginator.PageMetadata{
                after: encode_cursor(%{id: p5.id}),
+               last_page_after: encode_cursor(%{id: p10.id}),
                before: nil,
                limit: 5,
                total_count: 12,
-               total_count_cap_exceeded: false
+               total_count_cap_exceeded: false,
+               total_pages: 3
              }
     end
 
@@ -822,10 +824,9 @@ defmodule EctoInterface.PaginatorTest do
       payments: {_p1, _p2, _p3, _p4, p5, _p6, _p7, _p8, _p9, _p10, _p11, _p12}
     } do
       %EctoInterface.Paginator.Page{metadata: metadata} =
-        payments_by_customer_name()
+        from(p in EctoInterface.Payment)
         |> EctoInterface.TestRepo.paginate(
           cursor_fields: [:id],
-          sort_direction: :asc,
           limit: 5,
           include_total_count: true,
           total_count_limit: 10
@@ -834,9 +835,11 @@ defmodule EctoInterface.PaginatorTest do
       assert metadata == %EctoInterface.Paginator.PageMetadata{
                after: encode_cursor(%{id: p5.id}),
                before: nil,
+               last_page_after: encode_cursor(%{id: p5.id}),
                limit: 5,
                total_count: 10,
-               total_count_cap_exceeded: true
+               total_count_cap_exceeded: true,
+               total_pages: 2
              }
     end
 
@@ -855,10 +858,114 @@ defmodule EctoInterface.PaginatorTest do
 
       assert metadata == %EctoInterface.Paginator.PageMetadata{
                after: encode_cursor(%{city: a2.city}),
+               last_page_after: encode_cursor(%{city: a2.city}),
                before: nil,
                limit: 2,
                total_count: 3,
-               total_count_cap_exceeded: false
+               total_count_cap_exceeded: false,
+               total_pages: 2
+             }
+    end
+
+    test "when there is a last page", %{
+      payments: {_p1, _p2, _p3, _p4, p5, p6, _p7, _p8, _p9, p10, _p11, _p12}
+    } do
+      %EctoInterface.Paginator.Page{metadata: metadata} =
+        payments_by_customer_name()
+        |> EctoInterface.TestRepo.paginate(
+          after: encode_cursor(%{id: p5.id}),
+          cursor_fields: [id: :asc],
+          limit: 5,
+          total_count_limit: :infinity,
+          include_total_count: true
+        )
+
+      assert metadata == %EctoInterface.Paginator.PageMetadata{
+               after: encode_cursor(%{id: p10.id}),
+               before: encode_cursor(%{id: p6.id}),
+               last_page_after: encode_cursor(%{id: p10.id}),
+               limit: 5,
+               total_count: 12,
+               total_count_cap_exceeded: false,
+               total_pages: 3
+             }
+
+      %EctoInterface.Paginator.Page{metadata: metadata} =
+        payments_by_customer_name()
+        |> EctoInterface.TestRepo.paginate(
+          after: encode_cursor(%{id: p5.id}),
+          cursor_fields: [id: :asc],
+          limit: 5,
+          total_count_limit: 10,
+          include_total_count: true
+        )
+
+      assert metadata == %EctoInterface.Paginator.PageMetadata{
+               after: encode_cursor(%{id: p10.id}),
+               before: encode_cursor(%{id: p6.id}),
+               last_page_after: encode_cursor(%{id: p5.id}),
+               limit: 5,
+               total_count: 10,
+               total_count_cap_exceeded: true,
+               total_pages: 2
+             }
+    end
+
+    test "when there are multiple cursor_fields", %{} do
+      # [p6, p4, p5, p7, p8, p12, p2, p9, p11, p3, p1, p10] =
+      [_p1, _p2, _p3, _p4, p5, p6, _p7, _p8, _p9, p10, _p11, _p12] =
+        payments_by_amount_and_charged_at(:asc, :desc)
+        |> EctoInterface.TestRepo.all()
+
+      cursor_field_list = [:amount, :charged_at, :id]
+
+      %EctoInterface.Paginator.Page{metadata: metadata} =
+        payments_by_amount_and_charged_at(:asc, :desc)
+        |> EctoInterface.TestRepo.paginate(
+          after: encode_cursor(p5, cursor_field_list),
+          cursor_fields: [amount: :asc, charged_at: :desc, id: :asc],
+          limit: 5,
+          total_count_limit: :infinity,
+          include_total_count: true
+        )
+
+      assert metadata == %EctoInterface.Paginator.PageMetadata{
+               after: encode_cursor(p10, cursor_field_list),
+               before: encode_cursor(p6, cursor_field_list),
+               last_page_after: encode_cursor(p10, cursor_field_list),
+               limit: 5,
+               total_count: 12,
+               total_count_cap_exceeded: false,
+               total_pages: 3
+             }
+    end
+
+    test "when total is a multiple of limit and limit exceeds", %{} do
+      # [6, 4, 5, 7, 8, 10, 2, 1, 9, 3]
+      [_p1, _p2, _p3, _p4, p5, _p6, _p7, _p8, _p9, _p10] =
+        payments_by_amount_and_charged_at(:asc, :desc)
+        |> limit(10)
+        |> EctoInterface.TestRepo.all()
+
+      cursor_field_list = [:amount, :charged_at, :id]
+
+      %EctoInterface.Paginator.Page{metadata: metadata} =
+        payments_by_amount_and_charged_at(:asc, :desc)
+        |> EctoInterface.TestRepo.paginate(
+          cursor_fields: [amount: :asc, charged_at: :desc, id: :asc],
+          limit: 5,
+          total_count_limit: 10,
+          include_total_count: true
+        )
+
+      assert metadata == %EctoInterface.Paginator.PageMetadata{
+               after: encode_cursor(p5, cursor_field_list),
+               before: nil,
+               last_page_after: encode_cursor(p5, cursor_field_list),
+               limit: 5,
+               total_count: 10,
+               total_count_cap_exceeded: true,
+               total_pages: 2
              }
     end
   end
@@ -1280,6 +1387,11 @@ defmodule EctoInterface.PaginatorTest do
         asc: f.internal_uuid
       ]
     )
+  end
+
+  defp encode_cursor(record, fields) do
+    Map.take(record, fields)
+    |> EctoInterface.Paginator.Cursor.encode()
   end
 
   defp encode_cursor(value) do

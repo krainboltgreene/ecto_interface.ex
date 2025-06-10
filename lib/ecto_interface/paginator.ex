@@ -73,8 +73,8 @@ defmodule EctoInterface.Paginator do
     * `:fetch_cursor_value_fun` function of arity 2 to lookup cursor values on returned records.
     Defaults to `EctoInterface.Paginator.default_fetch_cursor_value/2`
     * `:include_total_count` - Set this to true to return the total number of
-    records matching the query. Note that this number will be capped by
-    `:total_count_limit`. Defaults to `false`.
+    records matching the query, also returns extra page metadata. Note that
+    this number will be capped by `:total_count_limit`. Defaults to `false`.
     * `:total_count_primary_key_field` - Running count queries on specified column of the table
     * `:limit` - Limits the number of records returned per page. Note that this
     number will be capped by `:maximum_limit`. Defaults to `50`.
@@ -176,17 +176,19 @@ defmodule EctoInterface.Paginator do
 
     sorted_entries = entries(queryable, config, repo, repo_opts)
     paginated_entries = paginate_entries(sorted_entries, config)
-    {total_count, total_count_cap_exceeded} = total_count(queryable, config, repo, repo_opts)
+    extra_page_metadata = fetch_extra_page_metadata(queryable, config, repo, repo_opts)
 
     %EctoInterface.Paginator.Page{
       entries: paginated_entries,
-      metadata: %EctoInterface.Paginator.PageMetadata{
-        before: before_cursor(paginated_entries, sorted_entries, config),
-        after: after_cursor(paginated_entries, sorted_entries, config),
-        limit: config.limit,
-        total_count: total_count,
-        total_count_cap_exceeded: total_count_cap_exceeded
-      }
+      metadata:
+        struct(
+          %EctoInterface.Paginator.PageMetadata{
+            before: before_cursor(paginated_entries, sorted_entries, config),
+            after: after_cursor(paginated_entries, sorted_entries, config),
+            limit: config.limit
+          },
+          extra_page_metadata
+        )
     }
   end
 
@@ -348,60 +350,231 @@ defmodule EctoInterface.Paginator do
     |> repo.all(repo_opts)
   end
 
-  defp total_count(
+  defp fetch_cursor_fields_list(%EctoInterface.Paginator.Config{
+         cursor_fields: cursor_fields,
+         sort_direction: sort_direction
+       }) do
+    cursor_fields
+    |> Enum.map(fn
+      {{cursor_field, _func}, order} when is_atom(cursor_field) ->
+        {cursor_field, order}
+
+      cursor_field when is_atom(cursor_field) ->
+        {cursor_field, sort_direction}
+
+      {cursor_field, order} ->
+        {cursor_field, order}
+    end)
+  end
+
+  defp reverse_dir(dir) do
+    case dir do
+      :desc -> :asc
+      :desc_nulls_last -> :asc_nulls_first
+      :desc_nulls_first -> :asc_nulls_last
+      :asc -> :desc
+      :asc_nulls_last -> :desc_nulls_first
+      :asc_nulls_first -> :desc_nulls_last
+    end
+  end
+
+  defp json_build_object(%EctoInterface.Paginator.Config{} = config) do
+    fetch_cursor_fields_list(config)
+    |> Enum.map(&elem(&1, 0))
+    |> json_build_object()
+  end
+
+  defp json_build_object(fields) when is_list(fields) do
+    last_index = length(fields) - 1
+
+    body =
+      Enum.with_index(fields)
+      |> Enum.reduce(dynamic(fragment("json_build_object(")), fn {field_name, index},
+                                                                 %Ecto.Query.DynamicExpr{} =
+                                                                   query ->
+        if last_index == index do
+          dynamic(
+            [q],
+            fragment(
+              "??, ?",
+              ^query,
+              type(^to_string(field_name), :string),
+              field(q, ^field_name)
+            )
+          )
+        else
+          dynamic(
+            [q],
+            fragment(
+              "??, ?,",
+              ^query,
+              type(^to_string(field_name), :string),
+              field(q, ^field_name)
+            )
+          )
+        end
+      end)
+
+    dynamic([q], fragment("?)", ^body))
+  end
+
+  defp reverse_cursor_sort(cursor_fields_list),
+    do:
+      Enum.map(cursor_fields_list, fn {cursor_field, dir} -> {reverse_dir(dir), cursor_field} end)
+
+  defmacro mod(dividend, divisor) do
+    quote do
+      fragment("MOD(?, ?)", unquote(dividend), unquote(divisor))
+    end
+  end
+
+  defmacro case_when(condition, then_expr, else_expr) do
+    quote do
+      fragment(
+        "CASE WHEN ? THEN ? ELSE ? END",
+        unquote(condition),
+        unquote(then_expr),
+        unquote(else_expr)
+      )
+    end
+  end
+
+  defp last_cursor_query(%EctoInterface.Paginator.Config{limit: limit} = config) do
+    cursor_fields_sort = fetch_cursor_fields_list(config)
+
+    from(q in "queryable",
+      select: ^json_build_object(config),
+      offset:
+        case_when(
+          fragment("? = 0", mod(parent_as(:total_count).overlimit, ^limit)),
+          ^limit,
+          mod(parent_as(:total_count).overlimit, ^limit)
+        ) + parent_as(:total_count).exceeded,
+      limit: 1,
+      order_by: ^reverse_cursor_sort(cursor_fields_sort)
+    )
+  end
+
+  defp total_count_query(%EctoInterface.Paginator.Config{
+         total_count_limit: :infinity,
+         total_count_primary_key_field: total_count_primary_key_field
+       }) do
+    from(q in "queryable",
+      select: %{
+        total: count(field(q, ^total_count_primary_key_field)),
+        exceeded: 0,
+        overlimit: count(field(q, ^total_count_primary_key_field))
+      }
+    )
+  end
+
+  defp total_count_query(%EctoInterface.Paginator.Config{
+         total_count_limit: total_count_limit,
+         total_count_primary_key_field: total_count_primary_key_field
+       }) do
+    from(q in "queryable",
+      select: %{
+        total: count(field(q, ^total_count_primary_key_field)),
+        exceeded:
+          fragment(
+            "(?)::int",
+            count(field(q, ^total_count_primary_key_field)) > ^total_count_limit
+          ),
+        overlimit:
+          fragment(
+            "? - (?)::int",
+            count(field(q, ^total_count_primary_key_field)),
+            count(field(q, ^total_count_primary_key_field)) > ^total_count_limit
+          )
+      }
+    )
+  end
+
+  defp query_extra_page_metadata(
+         queryable,
+         %EctoInterface.Paginator.Config{
+           limit: limit,
+           total_count_limit: total_count_limit
+         } = config,
+         repo,
+         repo_opts
+       )
+       when is_struct(queryable, Ecto.Query) do
+    queryable =
+      queryable
+      |> exclude(:order_by)
+      |> exclude(:preload)
+
+    %{total: total_count, last_page_record: last_page_record} =
+      from(r in "total_count", as: :total_count)
+      |> with_cte("queryable", as: ^queryable)
+      |> with_cte("total_count", as: ^total_count_query(config))
+      |> select([r], %{
+        total: r.total,
+        exceeded_total_limit: r.exceeded,
+        last_page_record: subquery(last_cursor_query(config))
+      })
+      |> repo.one(repo_opts)
+
+    capped_total_count = Enum.min([total_count, total_count_limit])
+
+    total_pages =
+      div(capped_total_count, limit) + if(rem(capped_total_count, limit) > 0, do: 1, else: 0)
+
+    cursor_fields_sort = fetch_cursor_fields_list(config)
+
+    last_page_record =
+      load_from_schema(queryable, last_page_record, Enum.map(cursor_fields_sort, &elem(&1, 0)))
+
+    %{
+      last_page_after: fetch_cursor_value(last_page_record, config),
+      total_pages: total_pages,
+      total_count: capped_total_count,
+      total_count_cap_exceeded: total_count > total_count_limit
+    }
+  end
+
+  # NOTE: repo.load(schema, record) does not cast correctly for some reason
+  defp load_from_schema(queryable, record, fields) do
+    %{from: %{source: {_table, schema}}} = queryable
+
+    struct = schema.__schema__(:loaded) |> Map.take(fields)
+
+    schema.__schema__(:load)
+    |> Map.new()
+    |> Map.take(fields)
+    |> Enum.reduce(struct, fn {field, type}, acc ->
+      Map.put(acc, field, Ecto.Type.cast!(type, Map.get(record, Atom.to_string(field))))
+    end)
+  end
+
+  defp fetch_extra_page_metadata(
          _queryable,
          %EctoInterface.Paginator.Config{include_total_count: false},
          _repo,
          _repo_opts
        ),
-       do: {nil, nil}
+       do: %{}
 
-  defp total_count(
+  defp fetch_extra_page_metadata(
          queryable,
-         %EctoInterface.Paginator.Config{
-           total_count_limit: :infinity,
-           total_count_primary_key_field: total_count_primary_key_field
-         },
+         %EctoInterface.Paginator.Config{total_count_limit: :infinity} = config,
          repo,
          repo_opts
        ) do
-    result =
-      queryable
-      |> exclude(:preload)
-      |> exclude(:select)
-      |> exclude(:order_by)
-      |> select([e], struct(e, [total_count_primary_key_field]))
-      |> subquery
-      |> select(count("*"))
-      |> repo.one(repo_opts)
-
-    {result, false}
+    queryable
+    |> query_extra_page_metadata(config, repo, repo_opts)
   end
 
-  defp total_count(
+  defp fetch_extra_page_metadata(
          queryable,
-         %EctoInterface.Paginator.Config{
-           total_count_limit: total_count_limit,
-           total_count_primary_key_field: total_count_primary_key_field
-         },
+         %EctoInterface.Paginator.Config{total_count_limit: total_count_limit} = config,
          repo,
          repo_opts
        ) do
-    result =
-      queryable
-      |> exclude(:preload)
-      |> exclude(:select)
-      |> exclude(:order_by)
-      |> limit(^(total_count_limit + 1))
-      |> select([e], struct(e, [total_count_primary_key_field]))
-      |> subquery
-      |> select(count("*"))
-      |> repo.one(repo_opts)
-
-    {
-      Enum.min([result, total_count_limit]),
-      result > total_count_limit
-    }
+    queryable
+    |> limit(^(total_count_limit + 1))
+    |> query_extra_page_metadata(config, repo, repo_opts)
   end
 
   # `sorted_entries` returns (limit+1) records, so before
@@ -420,7 +593,6 @@ defmodule EctoInterface.Paginator do
     |> Enum.reverse()
   end
 
-  defp paginate_entries(sorted_entries, %EctoInterface.Paginator.Config{limit: limit}) do
-    Enum.take(sorted_entries, limit)
-  end
+  defp paginate_entries(sorted_entries, %EctoInterface.Paginator.Config{limit: limit}),
+    do: Enum.take(sorted_entries, limit)
 end

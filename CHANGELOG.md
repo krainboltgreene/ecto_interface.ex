@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.2.0
+
+- [feature] Allow for pagination to deal with "last page" functionality.
+- [bug] Allow random functions to receive Ecto.Repo options.
+- [bug] Fixed some documentation misconceptions.
+
 ## 4.1.1
 
 - [bug] The subscription channel for an individual item change with options and the broadcast of the same parameters weren't the same. I've now corrected them.

@@ -314,6 +314,8 @@ defmodule EctoInterface.Paginator do
     end
   end
 
+  defp fetch_cursor_value(nil, _config), do: nil
+
   defp fetch_cursor_value(schema, %EctoInterface.Paginator.Config{
          cursor_fields: cursor_fields,
          fetch_cursor_value_fun: fetch_cursor_value_fun
@@ -533,6 +535,8 @@ defmodule EctoInterface.Paginator do
       total_count_cap_exceeded: total_count > total_count_limit
     }
   end
+
+  defp load_from_schema(_queryable, nil, _fields), do: nil
 
   # NOTE: repo.load(schema, record) does not cast correctly for some reason
   defp load_from_schema(queryable, record, fields) do

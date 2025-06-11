@@ -867,6 +867,27 @@ defmodule EctoInterface.PaginatorTest do
              }
     end
 
+    test "when there are no results" do
+      %EctoInterface.Paginator.Page{metadata: metadata} =
+        from(a in EctoInterface.Address, where: a.city == "Mauá")
+        |> EctoInterface.TestRepo.paginate(
+          limit: 5,
+          include_total_count: true,
+          cursor_fields: [:city],
+          total_count_primary_key_field: :city
+        )
+
+      assert metadata == %EctoInterface.Paginator.PageMetadata{
+               after: nil,
+               before: nil,
+               last_page_after: nil,
+               limit: 5,
+               total_count: 0,
+               total_count_cap_exceeded: false,
+               total_pages: 0
+             }
+    end
+
     test "when there is a last page", %{
       payments: {_p1, _p2, _p3, _p4, p5, p6, _p7, _p8, _p9, p10, _p11, _p12}
     } do

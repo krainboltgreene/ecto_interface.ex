@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.3.0
+
+- [feature] Allow for broadcast_resources_event(event, key, options) which enables special event broadcasts other than inserted or changed.
+
 ## 4.2.0
 
 - [feature] Allow for pagination to deal with "last page" functionality.

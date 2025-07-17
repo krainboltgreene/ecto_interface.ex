@@ -97,7 +97,7 @@ defmodule EctoInterface.PubSub do
       @spec unquote(:"broadcast_#{plural}_insert")(atom() | integer() | String.t(), atom()) ::
               :ok | {:error, term()}
       def unquote(:"broadcast_#{plural}_insert")(key, options \\ []) do
-        do_broadcast_plural_event(
+        EctoInterface.PubSub.broadcast_plural_event(
           unquote(pubsub),
           :inserted,
           key,
@@ -149,7 +149,7 @@ defmodule EctoInterface.PubSub do
               Keyword.t() | nil
             ) :: :ok | {:error, term()}
       def unquote(:"broadcast_#{plural}_change")(key, options \\ []) do
-        do_broadcast_plural_event(
+        EctoInterface.PubSub.broadcast_plural_event(
           unquote(pubsub),
           :changed,
           key,
@@ -203,7 +203,7 @@ defmodule EctoInterface.PubSub do
               Keyword.t() | nil
             ) :: :ok | {:error, term()}
       def unquote(:"broadcast_#{plural}_event")(event, key, options \\ []) do
-        do_broadcast_plural_event(
+        EctoInterface.PubSub.broadcast_plural_event(
           unquote(pubsub),
           event,
           key,
@@ -212,34 +212,34 @@ defmodule EctoInterface.PubSub do
           options
         )
       end
-
-      defp do_broadcast_plural_event(pubsub, event, key, plural, singular, options \\ []) do
-        if Keyword.keyword?(options) && Enum.any?(options) do
-          Phoenix.PubSub.broadcast(
-            pubsub,
-            Base.encode64(:erlang.term_to_binary({__MODULE__, singular, key, options})),
-            {event, {singular, key, options}}
-          )
-
-          Phoenix.PubSub.broadcast(
-            pubsub,
-            Base.encode64(:erlang.term_to_binary({__MODULE__, plural, options})),
-            {event, {singular, key}}
-          )
-        end
-
-        Phoenix.PubSub.broadcast(
-          pubsub,
-          Base.encode64(:erlang.term_to_binary({__MODULE__, singular, key})),
-          {event, {singular, key}}
-        )
-
-        Phoenix.PubSub.broadcast(
-          pubsub,
-          Base.encode64(:erlang.term_to_binary({__MODULE__, plural})),
-          {event, {singular, key}}
-        )
-      end
     end
+  end
+
+  def broadcast_plural_event(pubsub, event, key, plural, singular, options \\ []) do
+    if Keyword.keyword?(options) && Enum.any?(options) do
+      Phoenix.PubSub.broadcast(
+        pubsub,
+        Base.encode64(:erlang.term_to_binary({__MODULE__, singular, key, options})),
+        {event, {singular, key, options}}
+      )
+
+      Phoenix.PubSub.broadcast(
+        pubsub,
+        Base.encode64(:erlang.term_to_binary({__MODULE__, plural, options})),
+        {event, {singular, key}}
+      )
+    end
+
+    Phoenix.PubSub.broadcast(
+      pubsub,
+      Base.encode64(:erlang.term_to_binary({__MODULE__, singular, key})),
+      {event, {singular, key}}
+    )
+
+    Phoenix.PubSub.broadcast(
+      pubsub,
+      Base.encode64(:erlang.term_to_binary({__MODULE__, plural})),
+      {event, {singular, key}}
+    )
   end
 end

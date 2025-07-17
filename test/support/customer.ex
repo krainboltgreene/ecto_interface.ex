@@ -1,4 +1,4 @@
-defmodule EctoInterface.Customer do
+defmodule EctoInterfaceContext.Customer do
   @moduledoc false
   use Ecto.Schema
 
@@ -11,8 +11,8 @@ defmodule EctoInterface.Customer do
     field(:internal_uuid, :binary_id)
     field(:rank_value, :float, virtual: true)
 
-    has_many(:payments, EctoInterface.Payment)
-    has_one(:address, EctoInterface.Address)
+    has_many(:payments, EctoInterfaceContext.Payment)
+    has_one(:address, EctoInterfaceContext.Address)
 
     timestamps()
   end

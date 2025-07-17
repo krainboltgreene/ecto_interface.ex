@@ -9,7 +9,7 @@ defmodule EctoInterface.MixProject do
         links: %{"GitHub" => "https://github.com/krainboltgreene/ecto_interface.ex"},
         licenses: ["Hippocratic-3.0"]
       },
-      version: "4.3.0",
+      version: "5.0.0",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -34,6 +34,7 @@ defmodule EctoInterface.MixProject do
   defp deps do
     [
       {:ecto, "~> 3.11"},
+      {:phoenix_pubsub, "~> 2.1", optional: true},
       {:slugy, "~> 4.1", optional: true},
       {:ecto_sql, "~> 3.0", only: [:docs, :dev, :test]},
       {:ecto_sqlite3, "~> 0.18.0", only: [:docs, :dev, :test]},

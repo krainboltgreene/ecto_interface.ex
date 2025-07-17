@@ -24,64 +24,66 @@ defmodule EctoInterface.Read.Get do
       import Ecto.Query
 
       @doc """
-      Returns a singular `#{unquote(source)}` based on a query and primary key, if no record is found it returns `nil`
+      Returns a singular `#{__MODULE__.unquote(source)}` based on a query and primary key, if no record is found it returns `nil`
       """
       @spec unquote(:"get_#{singular}_by")(
               String.t() | integer,
               (Ecto.Query.t() -> Ecto.Query.t())
             ) ::
-              unquote(source).t() | nil
+              __MODULE__.unquote(source).t() | nil
       @spec unquote(:"get_#{singular}_by")(
               String.t() | integer,
               (Ecto.Query.t() -> Ecto.Query.t()),
               Keyword.t()
             ) ::
-              unquote(source).t() | nil
+              __MODULE__.unquote(source).t() | nil
       def unquote(:"get_#{singular}_by")(id, subquery, options \\ [])
           when (is_binary(id) or is_integer(id)) and is_function(subquery, 1),
           do:
-            subquery.(unquote(source))
+            subquery.(__MODULE__.unquote(source))
             |> unquote(repo).get(id, options)
 
       @doc """
-      Returns a singular `#{unquote(source)}` based on the primary key and primary key, if no record is found it returns `nil`
+      Returns a singular `#{__MODULE__.unquote(source)}` based on the primary key and primary key, if no record is found it returns `nil`
       """
-      @spec unquote(:"get_#{singular}")(String.t() | integer) :: unquote(source).t() | nil
+      @spec unquote(:"get_#{singular}")(String.t() | integer) ::
+              __MODULE__.unquote(source).t() | nil
       @spec unquote(:"get_#{singular}")(String.t() | integer, Keyword.t()) ::
-              unquote(source).t() | nil
+              __MODULE__.unquote(source).t() | nil
       def unquote(:"get_#{singular}")(id, options \\ []) when is_binary(id) or is_integer(id),
         do:
-          unquote(source)
+          __MODULE__.unquote(source)
           |> unquote(repo).get(id, options)
 
       @doc """
-      Returns a singular `#{unquote(source)}` based on a query, but if it isn't found will raise an exception
+      Returns a singular `#{__MODULE__.unquote(source)}` based on a query, but if it isn't found will raise an exception
       """
       @spec unquote(:"get_#{singular}_by!")(
               String.t() | integer,
               (Ecto.Query.t() -> Ecto.Query.t())
             ) ::
-              unquote(source).t()
+              __MODULE__.unquote(source).t()
       @spec unquote(:"get_#{singular}_by!")(
               String.t() | integer,
               (Ecto.Query.t() -> Ecto.Query.t()),
               Keyword.t()
             ) ::
-              unquote(source).t()
+              __MODULE__.unquote(source).t()
       def unquote(:"get_#{singular}_by!")(id, subquery, options \\ [])
           when is_binary(id) or (is_integer(id) and is_function(subquery, 1)),
           do:
-            subquery.(unquote(source))
+            subquery.(__MODULE__.unquote(source))
             |> unquote(repo).get!(id, options)
 
       @doc """
-      Returns a singular `#{unquote(source)}` based on the primary key, but if it isn't found will raise an exception
+      Returns a singular `#{__MODULE__.unquote(source)}` based on the primary key, but if it isn't found will raise an exception
       """
-      @spec unquote(:"get_#{singular}!")(String.t() | integer) :: unquote(source).t()
-      @spec unquote(:"get_#{singular}!")(String.t() | integer, Keyword.t()) :: unquote(source).t()
+      @spec unquote(:"get_#{singular}!")(String.t() | integer) :: __MODULE__.unquote(source).t()
+      @spec unquote(:"get_#{singular}!")(String.t() | integer, Keyword.t()) ::
+              __MODULE__.unquote(source).t()
       def unquote(:"get_#{singular}!")(id, options \\ []) when is_binary(id) or is_integer(id),
         do:
-          unquote(source)
+          __MODULE__.unquote(source)
           |> unquote(repo).get!(id, options)
     end
   end

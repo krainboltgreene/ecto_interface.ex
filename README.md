@@ -13,7 +13,7 @@ All you need to do is `use(EctoInterface)` on your context modules:
 
 ```elixir
 defmodule Core.Users do
-  use EctoInterface, source: Core.Users.Account, plural: :accounts, singular: :account
+  use EctoInterface, source: Account, plural: :accounts, singular: :account
 end
 ```
 
@@ -23,7 +23,7 @@ Additionally if you have `slugy` installed you can use:
 
 ```elixir
 defmodule Core.Users do
-  use EctoInterface, source: Core.Users.Account, plural: :accounts, singular: :account, slug: :username
+  use EctoInterface, source: Account, plural: :accounts, singular: :account, slug: :username
 end
 ```
 
@@ -33,7 +33,7 @@ Also, we have a simple interface for tags:
 
 ```elixir
 defmodule Core.Users do
-  use EctoInterface, source: Core.Users.Account, plural: :accounts, singular: :account, tagged: :tags
+  use EctoInterface, source: Account, plural: :accounts, singular: :account, tagged: :tags
 end
 ```
 
@@ -43,7 +43,7 @@ Another interface is the `PubSub` interface:
 
 ```elixir
 defmodule Core.Users do
-  use EctoInterface, source: Core.Users.Account, plural: :accounts, singular: :account, pubsub: true
+  use EctoInterface, source: Account, plural: :accounts, singular: :account, pubsub: true
 end
 ```
 

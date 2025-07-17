@@ -779,7 +779,7 @@ defmodule EctoInterface.PaginatorTest do
       payments: {_p1, _p2, _p3, _p4, p5, _p6, _p7, _p8, _p9, p10, _p11, _p12}
     } do
       %EctoInterface.Paginator.Page{metadata: metadata} =
-        from(p in EctoInterface.Payment)
+        from(p in EctoInterfaceContext.Payment)
         |> EctoInterface.TestRepo.paginate(
           cursor_fields: [:id],
           limit: 5,
@@ -802,7 +802,7 @@ defmodule EctoInterface.PaginatorTest do
       payments: {_p1, _p2, _p3, _p4, p5, _p6, _p7, _p8, _p9, p10, _p11, _p12}
     } do
       %EctoInterface.Paginator.Page{metadata: metadata} =
-        from(p in EctoInterface.Payment)
+        from(p in EctoInterfaceContext.Payment)
         |> EctoInterface.TestRepo.paginate(
           cursor_fields: [:id],
           limit: 5,
@@ -824,7 +824,7 @@ defmodule EctoInterface.PaginatorTest do
       payments: {_p1, _p2, _p3, _p4, p5, _p6, _p7, _p8, _p9, _p10, _p11, _p12}
     } do
       %EctoInterface.Paginator.Page{metadata: metadata} =
-        from(p in EctoInterface.Payment)
+        from(p in EctoInterfaceContext.Payment)
         |> EctoInterface.TestRepo.paginate(
           cursor_fields: [:id],
           limit: 5,
@@ -847,7 +847,7 @@ defmodule EctoInterface.PaginatorTest do
       addresses: {_a1, a2, _a3}
     } do
       %EctoInterface.Paginator.Page{metadata: metadata} =
-        from(a in EctoInterface.Address, select: a)
+        from(a in EctoInterfaceContext.Address, select: a)
         |> EctoInterface.TestRepo.paginate(
           cursor_fields: [:city],
           sort_direction: :asc,
@@ -869,7 +869,7 @@ defmodule EctoInterface.PaginatorTest do
 
     test "when there are no results" do
       %EctoInterface.Paginator.Page{metadata: metadata} =
-        from(a in EctoInterface.Address, where: a.city == "Mauá")
+        from(a in EctoInterfaceContext.Address, where: a.city == "Mauá")
         |> EctoInterface.TestRepo.paginate(
           limit: 5,
           include_total_count: true,
@@ -1125,7 +1125,7 @@ defmodule EctoInterface.PaginatorTest do
 
       query =
         from(
-          p in EctoInterface.Payment,
+          p in EctoInterfaceContext.Payment,
           where: p.customer_id == ^customer.id,
           order_by: [{^unquote(order), p.charged_at}],
           select: p
@@ -1160,7 +1160,7 @@ defmodule EctoInterface.PaginatorTest do
 
       query =
         from(
-          p in EctoInterface.Payment,
+          p in EctoInterfaceContext.Payment,
           where: p.customer_id == ^customer.id,
           order_by: [{^unquote(field0_order), p.charged_at}, {^unquote(field1_order), p.id}],
           select: p
@@ -1322,7 +1322,7 @@ defmodule EctoInterface.PaginatorTest do
 
   defp payments_by_status(status, direction \\ :asc) do
     from(
-      p in EctoInterface.Payment,
+      p in EctoInterfaceContext.Payment,
       where: p.status == ^status,
       order_by: [{^direction, p.charged_at}, {^direction, p.id}],
       select: p
@@ -1331,7 +1331,7 @@ defmodule EctoInterface.PaginatorTest do
 
   defp payments_by_amount_and_charged_at(amount_direction, charged_at_direction) do
     from(
-      p in EctoInterface.Payment,
+      p in EctoInterfaceContext.Payment,
       order_by: [
         {^amount_direction, p.amount},
         {^charged_at_direction, p.charged_at},
@@ -1343,7 +1343,7 @@ defmodule EctoInterface.PaginatorTest do
 
   defp payments_by_charged_at(direction \\ :asc) do
     from(
-      p in EctoInterface.Payment,
+      p in EctoInterfaceContext.Payment,
       order_by: [{^direction, p.charged_at}, {^direction, p.id}],
       select: p
     )
@@ -1351,7 +1351,7 @@ defmodule EctoInterface.PaginatorTest do
 
   defp payments_by_customer_name(payment_id_direction \\ :asc, customer_name_direction \\ :asc) do
     from(
-      p in EctoInterface.Payment,
+      p in EctoInterfaceContext.Payment,
       as: :payments,
       join: c in assoc(p, :customer),
       as: :customer,
@@ -1366,7 +1366,7 @@ defmodule EctoInterface.PaginatorTest do
 
   defp payments_by_address_city(payment_id_direction \\ :asc, address_city_direction \\ :asc) do
     from(
-      p in EctoInterface.Payment,
+      p in EctoInterfaceContext.Payment,
       as: :payments,
       join: c in assoc(p, :customer),
       as: :customer,
@@ -1383,14 +1383,14 @@ defmodule EctoInterface.PaginatorTest do
 
   defp customer_payments_by_charged_at_and_amount(customer, direction \\ :asc) do
     from(
-      p in EctoInterface.Payment,
+      p in EctoInterfaceContext.Payment,
       where: p.customer_id == ^customer.id,
       order_by: [{^direction, p.charged_at}, {^direction, p.amount}, {^direction, p.id}]
     )
   end
 
   defp customers_with_tsvector_rank(q) do
-    from(f in EctoInterface.Customer,
+    from(f in EctoInterfaceContext.Customer,
       select_merge: %{
         rank_value:
           fragment(

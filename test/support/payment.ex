@@ -1,4 +1,4 @@
-defmodule EctoInterface.Payment do
+defmodule EctoInterfaceContext.Payment do
   @moduledoc false
   use Ecto.Schema
 
@@ -10,7 +10,7 @@ defmodule EctoInterface.Payment do
     field(:description, :string)
     field(:status, :string)
 
-    belongs_to(:customer, EctoInterface.Customer)
+    belongs_to(:customer, EctoInterfaceContext.Customer)
 
     timestamps()
   end

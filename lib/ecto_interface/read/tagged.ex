@@ -26,12 +26,12 @@ defmodule EctoInterface.Read.Tagged do
       import Ecto.Query
 
       @doc """
-      Returns all `#{unquote(source)}` records that have *all* of the given tags
+      Returns all `#{__MODULE__.unquote(source)}` records that have *all* of the given tags
       """
       @spec unquote(:"list_#{plural}_with_tags")(list(String.t())) ::
-              list(unquote(source).t())
+              list(__MODULE__.unquote(source).t())
       @spec unquote(:"list_#{plural}_with_tags")(list(String.t()), Keyword.t()) ::
-              list(unquote(source).t())
+              list(__MODULE__.unquote(source).t())
       def unquote(:"list_#{plural}_with_tags")(tags, options \\ [])
 
       def unquote(:"list_#{plural}_with_tags")([], options),
@@ -39,7 +39,7 @@ defmodule EctoInterface.Read.Tagged do
 
       def unquote(:"list_#{plural}_with_tags")(tags, options) when is_list(tags) do
         from(
-          record in unquote(source),
+          record in __MODULE__.unquote(source),
           join: tag in assoc(record, unquote(tagged)),
           having: fragment("? @> ?", fragment("array_agg(?)", tag.slug), ^tags),
           group_by: record.id

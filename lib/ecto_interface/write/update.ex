@@ -19,43 +19,44 @@ defmodule EctoInterface.Write.Update do
 
     quote do
       @doc """
-      Applies a `value` to the given `record`, a `#{unquote(source)}`, via the `#{unquote(source)}.changeset/2` function and then updates with the subsequent changeset. Allows for a
+      Applies a `value` to the given `record`, a `#{__MODULE__.unquote(source)}`, via the `#{__MODULE__.unquote(source)}.changeset/2` function and then updates with the subsequent changeset. Allows for a
       set of preloaded relationships by passing `preload: []`.
 
       This function will raise an exception if any validation issues are encountered.
       """
-      @spec unquote(:"update_#{singular}!")(unquote(source).t(), any()) ::
-              unquote(source).t()
+      @spec unquote(:"update_#{singular}!")(__MODULE__.unquote(source).t(), any()) ::
+              __MODULE__.unquote(source).t()
       def unquote(:"update_#{singular}!")(record, value, options \\ [])
-          when is_struct(record, unquote(source)) do
+          when is_struct(record, __MODULE__.unquote(source)) do
         {preload, options} = Keyword.pop(options, :preload, [])
 
         record
         |> unquote(repo).preload(preload)
-        |> (&apply(unquote(source), :changeset, [&1, value])).()
+        |> (&apply(__MODULE__.unquote(source), :changeset, [&1, value])).()
         |> unquote(repo).update!(options)
         |> unquote(repo).preload(preload)
       end
 
       @doc """
-      Applies a `value` to the given `record`, a `#{unquote(source)}`, with the `changeset_function` function, then updates the database with the
+      Applies a `value` to the given `record`, a `#{__MODULE__.unquote(source)}`, with the `changeset_function` function, then updates the database with the
       subsequent changeset. Allows for a set of preloaded relationships.
 
       This function will raise an exception if any validation issues are encountered.
       """
       @spec unquote(:"update_#{singular}_by!")(
-              unquote(source).t(),
+              __MODULE__.unquote(source).t(),
               any(),
               function()
             ) ::
-              unquote(source).t()
+              __MODULE__.unquote(source).t()
       def unquote(:"update_#{singular}_by!")(
             record,
             value,
             changeset_function,
             options \\ []
           )
-          when is_struct(record, unquote(source)) and is_function(changeset_function, 2) do
+          when is_struct(record, __MODULE__.unquote(source)) and
+                 is_function(changeset_function, 2) do
         {preload, options} = Keyword.pop(options, :preload, [])
 
         record
@@ -66,18 +67,23 @@ defmodule EctoInterface.Write.Update do
       end
 
       @doc """
-      Applies a `value` to the given `record`, a `#{unquote(source)}`, and then updates with the subsequent changeset. Allows for a
+      Applies a `value` to the given `record`, a `#{__MODULE__.unquote(source)}`, and then updates with the subsequent changeset. Allows for a
       set of preloaded relationships by passing `preload: []`.
       """
-      @spec unquote(:"update_#{singular}")(unquote(source).t(), any(), Keyword.t(list())) ::
-              {:ok, unquote(source).t()} | {:error, Ecto.Changeset.t(unquote(source).t())}
+      @spec unquote(:"update_#{singular}")(
+              __MODULE__.unquote(source).t(),
+              any(),
+              Keyword.t(list())
+            ) ::
+              {:ok, __MODULE__.unquote(source).t()}
+              | {:error, Ecto.Changeset.t(__MODULE__.unquote(source).t())}
       def unquote(:"update_#{singular}")(record, value, options \\ [])
-          when is_struct(record, unquote(source)) do
+          when is_struct(record, __MODULE__.unquote(source)) do
         {preload, options} = Keyword.pop(options, :preload, [])
 
         record
         |> unquote(repo).preload(preload)
-        |> (&apply(unquote(source), :changeset, [&1, value])).()
+        |> (&apply(__MODULE__.unquote(source), :changeset, [&1, value])).()
         |> unquote(repo).update(options)
         |> case do
           {:ok, record} ->
@@ -89,17 +95,19 @@ defmodule EctoInterface.Write.Update do
       end
 
       @doc """
-      Applies a `value` to the given `record`, a `#{unquote(source)}`, with the `changeset_function` function, then updates the database with the
+      Applies a `value` to the given `record`, a `#{__MODULE__.unquote(source)}`, with the `changeset_function` function, then updates the database with the
       subsequent changeset. Allows for a set of preloaded relationships.
       """
       @spec unquote(:"update_#{singular}_by")(
-              unquote(source).t(),
+              __MODULE__.unquote(source).t(),
               any(),
               function()
             ) ::
-              {:ok, unquote(source).t()} | {:error, Ecto.Changeset.t(unquote(source).t())}
+              {:ok, __MODULE__.unquote(source).t()}
+              | {:error, Ecto.Changeset.t(__MODULE__.unquote(source).t())}
       def unquote(:"update_#{singular}_by")(record, value, changeset_function, options \\ [])
-          when is_struct(record, unquote(source)) and is_function(changeset_function, 2) do
+          when is_struct(record, __MODULE__.unquote(source)) and
+                 is_function(changeset_function, 2) do
         {preload, options} = Keyword.pop(options, :preload, [])
 
         record

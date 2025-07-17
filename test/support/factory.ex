@@ -3,7 +3,7 @@ defmodule EctoInterface.Factory do
   use ExMachina.Ecto, repo: EctoInterface.TestRepo
 
   def customer_factory do
-    %EctoInterface.Customer{
+    %EctoInterfaceContext.Customer{
       name: "Bob",
       internal_uuid: Ecto.UUID.generate(),
       active: true
@@ -11,14 +11,14 @@ defmodule EctoInterface.Factory do
   end
 
   def address_factory do
-    %EctoInterface.Address{
+    %EctoInterfaceContext.Address{
       city: "City name",
       customer: build(:customer)
     }
   end
 
   def payment_factory do
-    %EctoInterface.Payment{
+    %EctoInterfaceContext.Payment{
       description: "Skittles",
       charged_at: DateTime.utc_now(),
       # +10 so it doesn't mess with low amounts we want to order on.

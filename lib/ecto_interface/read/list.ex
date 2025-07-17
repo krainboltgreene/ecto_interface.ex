@@ -24,30 +24,30 @@ defmodule EctoInterface.Read.List do
       import Ecto.Query
 
       @doc """
-      Returns all `#{unquote(source)}` records from a modified query
+      Returns all `#{__MODULE__.unquote(source)}` records from a modified query
       """
       @spec unquote(:"list_#{plural}_by")((Ecto.Query.t() -> Ecto.Query.t())) ::
-              list(unquote(source))
+              list(__MODULE__.unquote(source))
       @spec unquote(:"list_#{plural}_by")((Ecto.Query.t() -> Ecto.Query.t()), Keyword.t()) ::
-              list(unquote(source))
+              list(__MODULE__.unquote(source))
       def unquote(:"list_#{plural}_by")(subquery, options \\ [])
           when is_function(subquery, 1) and is_list(options),
           do:
-            subquery.(from(unquote(source)))
+            subquery.(from(__MODULE__.unquote(source)))
             |> unquote(repo).all(options)
 
       @doc """
-      Returns all `#{unquote(source)}` records, unsorted
+      Returns all `#{__MODULE__.unquote(source)}` records, unsorted
       """
-      @spec unquote(:"list_#{plural}")() :: list(unquote(source).t())
-      @spec unquote(:"list_#{plural}")(Keyword.t()) :: list(unquote(source).t())
+      @spec unquote(:"list_#{plural}")() :: list(__MODULE__.unquote(source).t())
+      @spec unquote(:"list_#{plural}")(Keyword.t()) :: list(__MODULE__.unquote(source).t())
       def unquote(:"list_#{plural}")(options \\ []) when is_list(options),
         do:
-          from(unquote(source))
+          from(__MODULE__.unquote(source))
           |> unquote(repo).all(options)
 
       @doc """
-      Returns a stream of `#{unquote(source)}` records from a modified query
+      Returns a stream of `#{__MODULE__.unquote(source)}` records from a modified query
       """
       @spec unquote(:"stream_#{plural}_by")((Ecto.Query.t() -> Ecto.Query.t())) ::
               Enum.t()
@@ -56,21 +56,21 @@ defmodule EctoInterface.Read.List do
       def unquote(:"stream_#{plural}_by")(subquery, options \\ [])
           when is_function(subquery, 1) and is_list(options),
           do:
-            subquery.(from(unquote(source)))
+            subquery.(from(__MODULE__.unquote(source)))
             |> unquote(repo).stream(options)
 
       @doc """
-      Returns a stream of `#{unquote(source)}` records, unsorted
+      Returns a stream of `#{__MODULE__.unquote(source)}` records, unsorted
       """
       @spec unquote(:"stream_#{plural}")() :: Enum.t()
       @spec unquote(:"stream_#{plural}")(Keyword.t()) :: Enum.t()
       def unquote(:"stream_#{plural}")(options \\ []) when is_list(options),
         do:
-          from(unquote(source))
+          from(__MODULE__.unquote(source))
           |> unquote(repo).stream(options)
 
       @doc """
-      Returns a stream of `#{unquote(source)}` records from a modified query. There are two optional arguments: The first is the
+      Returns a stream of `#{__MODULE__.unquote(source)}` records from a modified query. There are two optional arguments: The first is the
       `pagination_options` which govern the pagination mechanism. The second is the `repository_options` which governs
       the repository interface.
       """
@@ -92,7 +92,7 @@ defmodule EctoInterface.Read.List do
           when is_function(subquery, 1) and is_list(pagination_options) and
                  is_list(repository_options),
           do:
-            unquote(source)
+            __MODULE__.unquote(source)
             |> from()
             |> subquery.()
             |> unquote(repo).paginate(
@@ -101,7 +101,7 @@ defmodule EctoInterface.Read.List do
             )
 
       @doc """
-      Returns a stream of `#{unquote(source)}` records, unsorted. There are two optional arguments: The first is the
+      Returns a stream of `#{__MODULE__.unquote(source)}` records, unsorted. There are two optional arguments: The first is the
       `pagination_options` which govern the pagination mechanism. The second is the `repository_options` which governs
       the repository interface.
       """
@@ -111,7 +111,7 @@ defmodule EctoInterface.Read.List do
       def unquote(:"paginate_#{plural}")(pagination_options \\ [], repository_options \\ [])
           when is_list(pagination_options) and is_list(repository_options),
           do:
-            unquote(source)
+            __MODULE__.unquote(source)
             |> from()
             |> unquote(repo).paginate(
               pagination_options,

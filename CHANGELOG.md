@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.0.1
+
+- [bug] We were accidentally listening to a different key than publishing, that has now been fixed
+
 ## 5.0.0
 
 - [breaking] To reduce compile time depenencies we've made it so you no longer have to reference the entire module name in the `source` property, now it's just the name of the module itself.

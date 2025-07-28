@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.0.2
+
+- [bug] broadcast_resources_insert/2 had a bad arguement causing confusion in the pubsub call
+
 ## 5.0.1
 
 - [bug] We were accidentally listening to a different key than publishing, that has now been fixed

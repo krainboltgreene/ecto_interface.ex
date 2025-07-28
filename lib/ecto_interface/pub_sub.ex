@@ -98,6 +98,7 @@ defmodule EctoInterface.PubSub do
               :ok | {:error, term()}
       def unquote(:"broadcast_#{plural}_insert")(key, options \\ []) do
         EctoInterface.PubSub.broadcast_plural_event(
+          __MODULE__,
           unquote(pubsub),
           :inserted,
           key,
@@ -171,11 +172,11 @@ defmodule EctoInterface.PubSub do
 
       You can then define the listener:
 
-          def handle_info(:published, {:#{unquote(plural)}, {id, message}}), do: # ...
+          def handle_info(:published, {:#{unquote(plural)}, id}), do: # ...
 
       And broadcast via:
 
-        #{__MODULE__}.broadcast_#{unquote(plural)}_event(:published, #{unquote(singular)}.id, message)
+        #{__MODULE__}.broadcast_#{unquote(plural)}_event(:published, #{unquote(singular)}.id)
 
       However if you want to pub/sub to a specific record:
 
@@ -188,19 +189,19 @@ defmodule EctoInterface.PubSub do
 
       And to the broadcast:
 
-          #{__MODULE__}.broadcast_#{unquote(plural)}_event(:published, #{unquote(singular)}.id, message, prefix: "live", tenant: post.merchant.slug)
+          #{__MODULE__}.broadcast_#{unquote(plural)}_event(:published, #{unquote(singular)}.id, prefix: "live", tenant: post.merchant.slug)
 
       You have to change your listener signature:
 
-          def handle_info(:published, {:#{unquote(plural)}, {id, message}, options}), do: # ...
+          def handle_info(:published, {:#{unquote(plural)}, id}, options}), do: # ...
 
       NOTE: The following subscription will also pick up the above broadcast, but obviously won't have the options:
 
           #{__MODULE__}.subscribe_to_#{unquote(singular)}(#{unquote(singular)}.id)
       """
       @spec unquote(:"broadcast_#{plural}_event")(
-              atom() | integer() | String.t(),
               atom() | String.t(),
+              atom() | integer() | String.t(),
               Keyword.t() | nil
             ) :: :ok | {:error, term()}
       def unquote(:"broadcast_#{plural}_event")(event, key, options \\ []) do

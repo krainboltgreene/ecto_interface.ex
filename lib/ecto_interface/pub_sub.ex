@@ -33,7 +33,10 @@ defmodule EctoInterface.PubSub do
           )
         end
 
-        Base.encode64(:erlang.term_to_binary({__MODULE__, unquote(plural)}))
+        Phoenix.PubSub.subscribe(
+          unquote(pubsub),
+          Base.encode64(:erlang.term_to_binary({__MODULE__, unquote(plural)}))
+        )
       end
 
       @doc """
@@ -67,7 +70,7 @@ defmodule EctoInterface.PubSub do
 
       You can then define the listener:
 
-          def handle_info(:inserted, {:#{unquote(plural)}, key}), do: # ...
+          def handle_info({:inserted, {:#{unquote(plural)}, key}}, socket), do: # ...
 
       And broadcast via:
 
@@ -88,7 +91,7 @@ defmodule EctoInterface.PubSub do
 
       You have to change your listener signature:
 
-          def handle_info(:inserted, {:#{unquote(plural)}, key, _options}), do: # ...
+          def handle_info({:inserted, {:#{unquote(plural)}, key, _options}}, socket), do: # ...
 
       NOTE: The following subscription will also pick up the above broadcast, but obviously won't have the options:
 
@@ -118,7 +121,7 @@ defmodule EctoInterface.PubSub do
 
       You can then define the listener:
 
-          def handle_info(:changed, {:#{unquote(plural)}, key}), do: # ...
+          def handle_info({:changed, {:#{unquote(plural)}, key}}, socket), do: # ...
 
       And broadcast via:
 
@@ -139,7 +142,7 @@ defmodule EctoInterface.PubSub do
 
       You have to change your listener signature:
 
-          def handle_info(:changed, {:#{unquote(plural)}, key, _options}), do: # ...
+          def handle_info({:changed, {:#{unquote(plural)}, key, _options}}, socket), do: # ...
 
       NOTE: The following subscription will also pick up the above broadcast, but obviously won't have the options:
 
@@ -172,7 +175,7 @@ defmodule EctoInterface.PubSub do
 
       You can then define the listener:
 
-          def handle_info(:published, {:#{unquote(plural)}, id}), do: # ...
+          def handle_info({:published, {:#{unquote(plural)}, id}}, socket), do: # ...
 
       And broadcast via:
 
@@ -193,7 +196,7 @@ defmodule EctoInterface.PubSub do
 
       You have to change your listener signature:
 
-          def handle_info(:published, {:#{unquote(plural)}, id}, options}), do: # ...
+          def handle_info({:published, {:#{unquote(plural)}, id}, options}}, socket), do: # ...
 
       NOTE: The following subscription will also pick up the above broadcast, but obviously won't have the options:
 

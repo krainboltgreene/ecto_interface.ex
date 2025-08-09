@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.0.3
+
+- [bug] Plural subscription without tenancy weren't actually subscribing
+- [bug] Documentation around handle_info/2 definitions weren't correct
+
 ## 5.0.2
 
 - [bug] broadcast_resources_insert/2 had a bad arguement causing confusion in the pubsub call

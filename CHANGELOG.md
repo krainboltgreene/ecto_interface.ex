@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.0.0
+
+- [breaking] Currently whenever a subscription is called N-times there are, exectedly, N-times as many event handler calls. However given the goals of the library (to provide simple interfaces for commonly defined functionality) it's more expected to unsubscribe from all listeners first and then subscribe.
+
 ## 5.0.3
 
 - [bug] Plural subscription without tenancy weren't actually subscribing

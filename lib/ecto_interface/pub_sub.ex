@@ -27,11 +27,21 @@ defmodule EctoInterface.PubSub do
       @spec unquote(:"subscribe_to_#{plural}")(Keyword.t() | nil) :: :ok
       def unquote(:"subscribe_to_#{plural}")(options \\ []) do
         if Keyword.keyword?(options) && Enum.any?(options) do
+          Phoenix.PubSub.unsubscribe(
+            unquote(pubsub),
+            Base.encode64(:erlang.term_to_binary({__MODULE__, unquote(plural), options}))
+          )
+
           Phoenix.PubSub.subscribe(
             unquote(pubsub),
             Base.encode64(:erlang.term_to_binary({__MODULE__, unquote(plural), options}))
           )
         end
+
+        Phoenix.PubSub.unsubscribe(
+          unquote(pubsub),
+          Base.encode64(:erlang.term_to_binary({__MODULE__, unquote(plural)}))
+        )
 
         Phoenix.PubSub.subscribe(
           unquote(pubsub),
@@ -48,11 +58,21 @@ defmodule EctoInterface.PubSub do
             ) :: :ok
       def unquote(:"subscribe_to_#{singular}")(key, options \\ []) do
         if Keyword.keyword?(options) && Enum.any?(options) do
+          Phoenix.PubSub.unsubscribe(
+            unquote(pubsub),
+            Base.encode64(:erlang.term_to_binary({__MODULE__, unquote(singular), key, options}))
+          )
+
           Phoenix.PubSub.subscribe(
             unquote(pubsub),
             Base.encode64(:erlang.term_to_binary({__MODULE__, unquote(singular), key, options}))
           )
         else
+          Phoenix.PubSub.unsubscribe(
+            unquote(pubsub),
+            Base.encode64(:erlang.term_to_binary({__MODULE__, unquote(singular), key}))
+          )
+
           Phoenix.PubSub.subscribe(
             unquote(pubsub),
             Base.encode64(:erlang.term_to_binary({__MODULE__, unquote(singular), key}))

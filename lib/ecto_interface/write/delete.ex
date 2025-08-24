@@ -2,8 +2,11 @@ defmodule EctoInterface.Write.Delete do
   @moduledoc false
   defmacro __using__(options) when is_list(options) do
     source =
-      Keyword.get(options, :source) ||
-        raise "Missing :source key in use(EctoInterface) call"
+      EctoInterface.expand_alias(
+        Keyword.get(options, :source) ||
+          raise("Missing :source key in use(EctoInterface) call"),
+        __CALLER__
+      )
 
     singular =
       Keyword.get(options, :singular) ||
@@ -19,24 +22,24 @@ defmodule EctoInterface.Write.Delete do
 
     quote do
       @doc """
-      Takes an `#{__MODULE__.unquote(source)}` and deletes it from the database.
+      Takes an `#{unquote(source)}` and deletes it from the database.
       """
-      @spec unquote(:"delete_#{singular}")(__MODULE__.unquote(source).t()) ::
-              {:ok, __MODULE__.unquote(source).t()}
-              | {:error, Ecto.Changeset.t(__MODULE__.unquote(source).t())}
+      @spec unquote(:"delete_#{singular}")(unquote(source).t()) ::
+              {:ok, unquote(source).t()}
+              | {:error, Ecto.Changeset.t(unquote(source).t())}
       def unquote(:"delete_#{singular}")(record, options \\ [])
-          when is_struct(record, __MODULE__.unquote(source)),
+          when is_struct(record, unquote(source)),
           do: unquote(repo).delete(record, options)
 
       @doc """
-      Takes an `#{__MODULE__.unquote(source)}` and deletes it from the database.
+      Takes an `#{unquote(source)}` and deletes it from the database.
 
       If the row can't be found or constraints prevent you from deleting the row, this will raise an exception.
       """
-      @spec unquote(:"delete_#{singular}!")(__MODULE__.unquote(source).t()) ::
-              __MODULE__.unquote(source).t()
+      @spec unquote(:"delete_#{singular}!")(unquote(source).t()) ::
+              unquote(source).t()
       def unquote(:"delete_#{singular}!")(record, options \\ [])
-          when is_struct(record, __MODULE__.unquote(source)),
+          when is_struct(record, unquote(source)),
           do: unquote(repo).delete!(record, options)
     end
   end

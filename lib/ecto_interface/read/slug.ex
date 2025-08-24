@@ -5,8 +5,11 @@ defmodule EctoInterface.Read.Slug do
   defmacro __using__(options)
            when is_list(options) do
     source =
-      Keyword.get(options, :source) ||
-        raise "Missing :source key in use(EctoInterface) call"
+      EctoInterface.expand_alias(
+        Keyword.get(options, :source) ||
+          raise("Missing :source key in use(EctoInterface) call"),
+        __CALLER__
+      )
 
     singular =
       Keyword.get(options, :singular) ||
@@ -28,29 +31,29 @@ defmodule EctoInterface.Read.Slug do
       import Ecto.Query
 
       @doc """
-      Returns a singular `#{__MODULE__.unquote(source)}` based on the slug column, but if it isn't found will raise an exception
+      Returns a singular `#{unquote(source)}` based on the slug column, but if it isn't found will raise an exception
       """
-      @spec unquote(:"get_#{singular}_by_slug!")(String.t()) :: __MODULE__.unquote(source).t()
+      @spec unquote(:"get_#{singular}_by_slug!")(String.t()) :: unquote(source).t()
       @spec unquote(:"get_#{singular}_by_slug!")(String.t(), Keyword.t()) ::
-              __MODULE__.unquote(source).t()
+              unquote(source).t()
       def unquote(:"get_#{singular}_by_slug!")(name_or_slug, options \\ [])
           when is_binary(name_or_slug),
           do:
-            __MODULE__.unquote(source)
+            unquote(source)
             |> from(where: [{unquote(slug), ^Slugy.slugify(name_or_slug)}], limit: 1)
             |> unquote(repo).one!(options)
 
       @doc """
-      Returns a singular `#{__MODULE__.unquote(source)}` based on the slug column and if no record is found it returns `nil`
+      Returns a singular `#{unquote(source)}` based on the slug column and if no record is found it returns `nil`
       """
       @spec unquote(:"get_#{singular}_by_slug")(String.t()) ::
-              __MODULE__.unquote(source).t() | nil
+              unquote(source).t() | nil
       @spec unquote(:"get_#{singular}_by_slug")(String.t(), Keyword.t()) ::
-              __MODULE__.unquote(source).t() | nil
+              unquote(source).t() | nil
       def unquote(:"get_#{singular}_by_slug")(name_or_slug, options \\ [])
           when is_binary(name_or_slug),
           do:
-            __MODULE__.unquote(source)
+            unquote(source)
             |> from(where: [{unquote(slug), ^Slugy.slugify(name_or_slug)}], limit: 1)
             |> unquote(repo).one(options)
     end

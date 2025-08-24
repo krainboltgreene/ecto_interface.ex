@@ -5,8 +5,11 @@ defmodule EctoInterface.Read.Random do
   defmacro __using__(options)
            when is_list(options) do
     source =
-      Keyword.get(options, :source) ||
-        raise "Missing :source key in use(EctoInterface) call"
+      EctoInterface.expand_alias(
+        Keyword.get(options, :source) ||
+          raise("Missing :source key in use(EctoInterface) call"),
+        __CALLER__
+      )
 
     plural =
       Keyword.get(options, :plural) ||
@@ -28,56 +31,56 @@ defmodule EctoInterface.Read.Random do
       import Ecto.Query
 
       @doc """
-      Randomly selects a `#{__MODULE__.unquote(source)}` record based on a set of conditions
+      Randomly selects a `#{unquote(source)}` record based on a set of conditions
       """
       @spec unquote(:"random_#{singular}_by")((Ecto.Query.t() -> Ecto.Query.t())) ::
-              __MODULE__.unquote(source).t() | nil
+              unquote(source).t() | nil
       @spec unquote(:"random_#{singular}_by")((Ecto.Query.t() -> Ecto.Query.t()), Keyword.t()) ::
-              __MODULE__.unquote(source).t() | nil
+              unquote(source).t() | nil
       def unquote(:"random_#{singular}_by")(subquery, options \\ [])
           when is_function(subquery, 1) do
-        subquery.(from(__MODULE__.unquote(source)))
+        subquery.(from(unquote(source)))
         |> from(limit: 1, order_by: fragment("random()"))
         |> unquote(repo).one(options)
       end
 
       @doc """
-      Randomly selects a `#{__MODULE__.unquote(source)}` record
+      Randomly selects a `#{unquote(source)}` record
       """
-      @spec unquote(:"random_#{singular}")() :: __MODULE__.unquote(source).t() | nil
-      @spec unquote(:"random_#{singular}")(Keyword.t()) :: __MODULE__.unquote(source).t() | nil
+      @spec unquote(:"random_#{singular}")() :: unquote(source).t() | nil
+      @spec unquote(:"random_#{singular}")(Keyword.t()) :: unquote(source).t() | nil
       def unquote(:"random_#{singular}")(options \\ []) do
-        __MODULE__.unquote(source)
+        unquote(source)
         |> from(limit: 1, order_by: fragment("random()"))
         |> unquote(repo).one(options)
       end
 
       @doc """
-      Randomly selects `count` `#{__MODULE__.unquote(source)}` records based on a set of conditions
+      Randomly selects `count` `#{unquote(source)}` records based on a set of conditions
       """
       @spec unquote(:"random_#{plural}_by")(integer(), (Ecto.Query.t() -> Ecto.Query.t())) ::
-              list(__MODULE__.unquote(source).t())
+              list(unquote(source).t())
       @spec unquote(:"random_#{plural}_by")(
               integer(),
               (Ecto.Query.t() -> Ecto.Query.t()),
               Keyword.t()
             ) ::
-              list(__MODULE__.unquote(source).t())
+              list(unquote(source).t())
       def unquote(:"random_#{plural}_by")(count, subquery, options \\ [])
           when is_integer(count) and is_function(subquery, 1) do
-        subquery.(from(__MODULE__.unquote(source)))
+        subquery.(from(unquote(source)))
         |> from(limit: ^count, order_by: fragment("random()"))
         |> unquote(repo).all(options)
       end
 
       @doc """
-      Randomly selects `count` `#{__MODULE__.unquote(source)}` records.
+      Randomly selects `count` `#{unquote(source)}` records.
       """
-      @spec unquote(:"random_#{plural}")(integer()) :: list(__MODULE__.unquote(source).t())
+      @spec unquote(:"random_#{plural}")(integer()) :: list(unquote(source).t())
       @spec unquote(:"random_#{plural}")(integer(), Keyword.t()) ::
-              list(__MODULE__.unquote(source).t())
+              list(unquote(source).t())
       def unquote(:"random_#{plural}")(count, options \\ []) when is_integer(count) do
-        __MODULE__.unquote(source)
+        unquote(source)
         |> from(limit: ^count, order_by: fragment("random()"))
         |> unquote(repo).all(options)
       end

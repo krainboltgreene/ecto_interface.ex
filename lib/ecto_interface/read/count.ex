@@ -5,8 +5,11 @@ defmodule EctoInterface.Read.Count do
   defmacro __using__(options)
            when is_list(options) do
     source =
-      Keyword.get(options, :source) ||
-        raise "Missing :source key in use(EctoInterface) call"
+      EctoInterface.expand_alias(
+        Keyword.get(options, :source) ||
+          raise("Missing :source key in use(EctoInterface) call"),
+        __CALLER__
+      )
 
     plural =
       Keyword.get(options, :plural) ||
@@ -24,7 +27,7 @@ defmodule EctoInterface.Read.Count do
       import Ecto.Query
 
       @doc """
-      Counts the number of `#{__MODULE__.unquote(source)}` records in the databas e based on a set of conditions.
+      Counts the number of `#{unquote(source)}` records in the databas e based on a set of conditions.
       """
       @spec unquote(:"count_#{plural}_by")((Ecto.Query.t() -> Ecto.Query.t())) :: integer()
       @spec unquote(:"count_#{plural}_by")((Ecto.Query.t() -> Ecto.Query.t()), Keyword.t()) ::
@@ -32,7 +35,7 @@ defmodule EctoInterface.Read.Count do
       def unquote(:"count_#{plural}_by")(subquery, options \\ [])
           when is_function(subquery, 1) and is_list(options) do
         unquote(repo).aggregate(
-          subquery.(__MODULE__.unquote(source)),
+          subquery.(unquote(source)),
           :count,
           :id,
           options
@@ -40,13 +43,13 @@ defmodule EctoInterface.Read.Count do
       end
 
       @doc """
-      Counts the number of `#{__MODULE__.unquote(source)}` records in the database.
+      Counts the number of `#{unquote(source)}` records in the database.
       """
       @spec unquote(:"count_#{plural}")() :: integer()
       @spec unquote(:"count_#{plural}")(Keyword.t()) :: integer()
       def unquote(:"count_#{plural}")(options \\ []) when is_list(options) do
         unquote(repo).aggregate(
-          __MODULE__.unquote(source),
+          unquote(source),
           :count,
           :id,
           options

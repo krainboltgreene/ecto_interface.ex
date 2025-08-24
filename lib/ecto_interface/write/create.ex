@@ -2,8 +2,11 @@ defmodule EctoInterface.Write.Create do
   @moduledoc false
   defmacro __using__(options) when is_list(options) do
     source =
-      Keyword.get(options, :source) ||
-        raise "Missing :source key in use(EctoInterface) call"
+      EctoInterface.expand_alias(
+        Keyword.get(options, :source) ||
+          raise("Missing :source key in use(EctoInterface) call"),
+        __CALLER__
+      )
 
     singular =
       Keyword.get(options, :singular) ||
@@ -19,38 +22,38 @@ defmodule EctoInterface.Write.Create do
 
     quote do
       @doc """
-      Applies a `value` to a empty `#{__MODULE__.unquote(source)}` via `#{__MODULE__.unquote(source)}.changeset/2` and then inserts the changeset into the database. Allows for a list of
+      Applies a `value` to a empty `#{unquote(source)}` via `#{unquote(source)}.changeset/2` and then inserts the changeset into the database. Allows for a list of
       preloaded relationships by passing `preload: []`.
 
       This function will raise an exception if any validation issues are encountered.
       """
-      @spec unquote(:"create_#{singular}!")(any()) :: __MODULE__.unquote(source).t()
-      @spec unquote(:"create_#{singular}!")(any(), Keyword.t()) :: __MODULE__.unquote(source).t()
+      @spec unquote(:"create_#{singular}!")(any()) :: unquote(source).t()
+      @spec unquote(:"create_#{singular}!")(any(), Keyword.t()) :: unquote(source).t()
       def unquote(:"create_#{singular}!")(value, options \\ []) do
         {preload, options} = Keyword.pop(options, :preload, [])
 
-        %__MODULE__.unquote(source){}
+        %unquote(source){}
         |> unquote(repo).preload(preload)
-        |> (&apply(__MODULE__.unquote(source), :changeset, [&1, value])).()
+        |> (&apply(unquote(source), :changeset, [&1, value])).()
         |> unquote(repo).insert!(options)
         |> unquote(repo).preload(preload)
       end
 
       @doc """
-      Applies a `value` to a empty `#{__MODULE__.unquote(source)}` using `changeset` and then inserts resulting changeset into the database.
+      Applies a `value` to a empty `#{unquote(source)}` using `changeset` and then inserts resulting changeset into the database.
       Allows for a list of preloaded relationships by passing `preload: []`.
 
       This function will raise an exception if any validation issues are encountered.
       """
       @spec unquote(:"create_#{singular}_by!")(any(), function()) ::
-              __MODULE__.unquote(source).t()
+              unquote(source).t()
       @spec unquote(:"create_#{singular}_by!")(any(), function(), Keyword.t()) ::
-              __MODULE__.unquote(source).t()
+              unquote(source).t()
       def unquote(:"create_#{singular}_by!")(value, changeset_function, options \\ [])
           when is_function(changeset_function) do
         {preload, options} = Keyword.pop(options, :preload, [])
 
-        %__MODULE__.unquote(source){}
+        %unquote(source){}
         |> unquote(repo).preload(preload)
         |> changeset_function.(value)
         |> unquote(repo).insert!(options)
@@ -58,21 +61,21 @@ defmodule EctoInterface.Write.Create do
       end
 
       @doc """
-      Applies a `value` to a empty `#{__MODULE__.unquote(source)}` via `#{__MODULE__.unquote(source)}.changeset/2` and then inserts the changeset into the database. Allows for a list of
+      Applies a `value` to a empty `#{unquote(source)}` via `#{unquote(source)}.changeset/2` and then inserts the changeset into the database. Allows for a list of
       preloaded relationships by passing `preload: []`.
       """
       @spec unquote(:"create_#{singular}")(any()) ::
-              {:ok, __MODULE__.unquote(source).t()}
-              | {:error, Ecto.Changeset.t(__MODULE__.unquote(source).t())}
+              {:ok, unquote(source).t()}
+              | {:error, Ecto.Changeset.t(unquote(source).t())}
       @spec unquote(:"create_#{singular}")(any(), Keyword.t()) ::
-              {:ok, __MODULE__.unquote(source).t()}
-              | {:error, Ecto.Changeset.t(__MODULE__.unquote(source).t())}
+              {:ok, unquote(source).t()}
+              | {:error, Ecto.Changeset.t(unquote(source).t())}
       def unquote(:"create_#{singular}")(value, options \\ []) do
         {preload, options} = Keyword.pop(options, :preload, [])
 
-        %__MODULE__.unquote(source){}
+        %unquote(source){}
         |> unquote(repo).preload(preload)
-        |> (&apply(__MODULE__.unquote(source), :changeset, [&1, value])).()
+        |> (&apply(unquote(source), :changeset, [&1, value])).()
         |> unquote(repo).insert(options)
         |> case do
           {:ok, record} ->
@@ -84,20 +87,20 @@ defmodule EctoInterface.Write.Create do
       end
 
       @doc """
-      Applies a `value` to a empty `#{__MODULE__.unquote(source)}` using `changeset` and then inserts resulting changeset into the database.
+      Applies a `value` to a empty `#{unquote(source)}` using `changeset` and then inserts resulting changeset into the database.
       Allows for a list of preloaded relationships by passing `preload: []`.
       """
       @spec unquote(:"create_#{singular}_by")(any(), function()) ::
-              {:ok, __MODULE__.unquote(source).t()}
-              | {:error, Ecto.Changeset.t(__MODULE__.unquote(source).t())}
+              {:ok, unquote(source).t()}
+              | {:error, Ecto.Changeset.t(unquote(source).t())}
       @spec unquote(:"create_#{singular}_by")(any(), function(), Keyword.t()) ::
-              {:ok, __MODULE__.unquote(source).t()}
-              | {:error, Ecto.Changeset.t(__MODULE__.unquote(source).t())}
+              {:ok, unquote(source).t()}
+              | {:error, Ecto.Changeset.t(unquote(source).t())}
       def unquote(:"create_#{singular}_by")(value, changeset_function, options \\ [])
           when is_function(changeset_function) do
         {preload, options} = Keyword.pop(options, :preload, [])
 
-        %__MODULE__.unquote(source){}
+        %unquote(source){}
         |> unquote(repo).preload(preload)
         |> changeset_function.(value)
         |> unquote(repo).insert(options)

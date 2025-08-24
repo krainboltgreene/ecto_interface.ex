@@ -119,6 +119,6 @@ defmodule EctoInterface do
   end
 
   def expand_alias({:__aliases__, _, _} = alias, env) when is_struct(env, Macro.Env) do
-    Module.safe_concat(env.module, Macro.expand(alias, %{env | function: {:init, 1}}))
+    Module.concat(env.module, Macro.expand(alias, %{env | function: {:init, 1}}))
   end
 end

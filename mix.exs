@@ -9,7 +9,7 @@ defmodule EctoInterface.MixProject do
         links: %{"GitHub" => "https://github.com/krainboltgreene/ecto_interface.ex"},
         licenses: ["Hippocratic-3.0"]
       },
-      version: "6.0.1",
+      version: "6.0.2",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,

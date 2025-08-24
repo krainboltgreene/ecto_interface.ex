@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.0.2
+
+- [patch] `Module.safe_concat` doesn't account for load order issues that you might encounter, so I switched to the unsafe variant
+
 ## 6.0.1
 
 - [patch] Massively reduce the compile-time dependency costs of using ecto interface

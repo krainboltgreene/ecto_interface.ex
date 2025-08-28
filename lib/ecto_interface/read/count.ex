@@ -27,7 +27,31 @@ defmodule EctoInterface.Read.Count do
       import Ecto.Query
 
       @doc """
-      Counts the number of `#{unquote(source)}` records in the databas e based on a set of conditions.
+      Returns a multi that will count `#{unquote(source)}` records based on `subquery`.
+      """
+      @spec unquote(:"count_#{plural}_multi_by")(Ecto.Multi.t(), atom(), (Ecto.Query.t() ->
+                                                                            Ecto.Query.t())) ::
+              Ecto.Multi.t()
+      def unquote(:"count_#{plural}_multi_by")(multi, slug, subquery)
+          when is_struct(multi, Ecto.Multi) and is_atom(slug) and is_function(subquery, 1) do
+        Ecto.Multi.one(
+          multi,
+          slug,
+          subquery.(from(row in unquote(source), select: count(row.id)))
+        )
+      end
+
+      @doc """
+      Returns a multi that will count `#{unquote(source)}` records, unsorted
+      """
+      @spec unquote(:"count_#{plural}_multi")(Ecto.Multi.t(), atom()) :: Ecto.Multi.t()
+      def unquote(:"count_#{plural}_multi")(multi, slug)
+          when is_struct(multi, Ecto.Multi) and is_atom(slug) do
+        Ecto.Multi.one(multi, slug, from(row in unquote(source), select: count(row.id)))
+      end
+
+      @doc """
+      Counts the number of `#{unquote(source)}` records in the database based on `subquery`.
       """
       @spec unquote(:"count_#{plural}_by")((Ecto.Query.t() -> Ecto.Query.t())) :: integer()
       @spec unquote(:"count_#{plural}_by")((Ecto.Query.t() -> Ecto.Query.t()), Keyword.t()) ::

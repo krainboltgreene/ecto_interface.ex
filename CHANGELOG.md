@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.1.0
+
+- [feature] A new set of reader functions that can be used as part of an Ecto.Multi chain
+- [bug] random\_\* functions weren't fully using the keywords they were given and also formed their queries awkwardly
+
 ## 6.0.2
 
 - [patch] `Module.safe_concat` doesn't account for load order issues that you might encounter, so I switched to the unsafe variant

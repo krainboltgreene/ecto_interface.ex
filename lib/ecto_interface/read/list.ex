@@ -27,6 +27,26 @@ defmodule EctoInterface.Read.List do
       import Ecto.Query
 
       @doc """
+      Returns a multi that will return `#{unquote(source)}` records, modified by `subquery`.
+      """
+      @spec unquote(:"list_#{plural}_multi_by")(Ecto.Multi.t(), atom(), (Ecto.Query.t() ->
+                                                                           Ecto.Query.t())) ::
+              Ecto.Multi.t()
+      def unquote(:"list_#{plural}_multi_by")(multi, slug, subquery)
+          when is_struct(multi, Ecto.Multi) and is_atom(slug) and is_function(subquery, 1) do
+        Ecto.Multi.all(multi, slug, subquery.(from(unquote(source))))
+      end
+
+      @doc """
+      Returns a multi that will return `#{unquote(source)}` records, unsorted
+      """
+      @spec unquote(:"list_#{plural}_multi")(Ecto.Multi.t(), atom()) :: Ecto.Multi.t()
+      def unquote(:"list_#{plural}_multi")(multi, slug)
+          when is_struct(multi, Ecto.Multi) and is_atom(slug) do
+        Ecto.Multi.all(multi, slug, from(unquote(source)))
+      end
+
+      @doc """
       Returns all `#{unquote(source)}` records from a modified query
       """
       @spec unquote(:"list_#{plural}_by")((Ecto.Query.t() -> Ecto.Query.t())) ::

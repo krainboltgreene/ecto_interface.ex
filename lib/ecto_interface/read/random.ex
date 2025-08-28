@@ -39,8 +39,7 @@ defmodule EctoInterface.Read.Random do
               unquote(source).t() | nil
       def unquote(:"random_#{singular}_by")(subquery, options \\ [])
           when is_function(subquery, 1) do
-        subquery.(from(unquote(source)))
-        |> from(limit: 1, order_by: fragment("random()"))
+        subquery.(from(unquote(source), limit: 1, order_by: fragment("random()")))
         |> unquote(repo).one(options)
       end
 
@@ -50,8 +49,7 @@ defmodule EctoInterface.Read.Random do
       @spec unquote(:"random_#{singular}")() :: unquote(source).t() | nil
       @spec unquote(:"random_#{singular}")(Keyword.t()) :: unquote(source).t() | nil
       def unquote(:"random_#{singular}")(options \\ []) do
-        unquote(source)
-        |> from(limit: 1, order_by: fragment("random()"))
+        from(unquote(source), limit: 1, order_by: fragment("random()"))
         |> unquote(repo).one(options)
       end
 
@@ -68,8 +66,7 @@ defmodule EctoInterface.Read.Random do
               list(unquote(source).t())
       def unquote(:"random_#{plural}_by")(count, subquery, options \\ [])
           when is_integer(count) and is_function(subquery, 1) do
-        subquery.(from(unquote(source)))
-        |> from(limit: ^count, order_by: fragment("random()"))
+        subquery.(from(unquote(source), limit: ^count, order_by: fragment("random()")))
         |> unquote(repo).all(options)
       end
 
@@ -80,8 +77,7 @@ defmodule EctoInterface.Read.Random do
       @spec unquote(:"random_#{plural}")(integer(), Keyword.t()) ::
               list(unquote(source).t())
       def unquote(:"random_#{plural}")(count, options \\ []) when is_integer(count) do
-        unquote(source)
-        |> from(limit: ^count, order_by: fragment("random()"))
+        from(unquote(source), limit: ^count, order_by: fragment("random()"))
         |> unquote(repo).all(options)
       end
     end

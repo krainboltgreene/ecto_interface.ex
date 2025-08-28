@@ -27,6 +27,38 @@ defmodule EctoInterface.Read.Get do
       import Ecto.Query
 
       @doc """
+      Returns a multi that will return a `#{unquote(source)}` record, modified by `subquery`.
+      """
+      @spec unquote(:"get_#{singular}_multi_by")(
+              Ecto.Multi.t(),
+              atom(),
+              String.t() | integer,
+              (Ecto.Query.t() ->
+                 Ecto.Query.t())
+            ) ::
+              Ecto.Multi.t()
+      def unquote(:"get_#{singular}_multi_by")(multi, slug, id, subquery)
+          when is_struct(multi, Ecto.Multi) and is_atom(slug) and
+                 (is_binary(id) or is_integer(id)) and is_function(subquery, 1) do
+        Ecto.Multi.one(
+          multi,
+          slug,
+          subquery.(from(row in unquote(source), where: row.id == ^id, limit: 1))
+        )
+      end
+
+      @doc """
+      Returns a multi that will return a `#{unquote(source)}` record, unsorted
+      """
+      @spec unquote(:"get_#{singular}_multi")(Ecto.Multi.t(), atom(), String.t() | integer) ::
+              Ecto.Multi.t()
+      def unquote(:"get_#{singular}_multi")(multi, slug, id)
+          when is_struct(multi, Ecto.Multi) and is_atom(slug) and
+                 (is_binary(id) or is_integer(id)) do
+        Ecto.Multi.one(multi, slug, from(row in unquote(source), where: row.id == ^id, limit: 1))
+      end
+
+      @doc """
       Returns a singular `#{unquote(source)}` based on a query and primary key, if no record is found it returns `nil`
       """
       @spec unquote(:"get_#{singular}_by")(

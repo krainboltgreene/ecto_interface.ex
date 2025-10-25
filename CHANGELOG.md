@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.1.1
+
+- [minor] Losen the restrictions on postgres versions
+
 ## 6.1.0
 
 - [feature] A new set of reader functions that can be used as part of an Ecto.Multi chain

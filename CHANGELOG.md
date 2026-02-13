@@ -1,5 +1,10 @@
 # Changelog
 
+## 7.0.0
+
+- [breaking] I've decided the `_by() functions are, both read and write, largely a mistake. So I'm going to remove them.
+- [breaking] The scope pattern in Phoenix 1.19 is really good, so I'm going to adopt that.
+
 ## 6.1.1
 
 - [minor] Losen the restrictions on postgres versions

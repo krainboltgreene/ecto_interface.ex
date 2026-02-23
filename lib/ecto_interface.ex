@@ -7,7 +7,12 @@ defmodule EctoInterface do
   @doc """
   Using this expression in your context module:
 
-      use(EctoInterface, source: Core.Commerce.Product, plural: :products, singular: :product])
+      use(EctoInterface,
+        source: Product,
+        plural: :products,
+        singular: :product,
+        pubsub: true
+      )
 
   Will automatically define a whole suite of functions for that schema.
   """
@@ -73,11 +78,17 @@ defmodule EctoInterface do
         @doc """
         Returns a multi that will return a `#{unquote(source)}` record, unsorted
         """
-        @spec unquote(:"get_#{singular}_multi")(Ecto.Multi.t(), atom(), String.t() | integer) ::
+        @spec unquote(:"get_#{singular}_multi")(Ecto.Multi.t(), atom(), String.t() | integer()) ::
                 Ecto.Multi.t()
-        def unquote(:"get_#{singular}_multi")(multi, slug, id)
-            when is_struct(multi, Ecto.Multi) and is_atom(slug) and
-                   (is_binary(id) or is_integer(id)) do
+        @spec unquote(:"get_#{singular}_multi")(
+                Ecto.Multi.t(),
+                atom(),
+                String.t() | integer(),
+                Keyword.t()
+              ) ::
+                Ecto.Multi.t()
+        def unquote(:"get_#{singular}_multi")(%Ecto.Multi{} = multi, slug, id, options \\ [])
+            when is_atom(slug) and (is_binary(id) or is_integer(id)) do
           Ecto.Multi.one(
             multi,
             slug,
@@ -175,27 +186,6 @@ defmodule EctoInterface do
           from(unquote(source), limit: ^count, order_by: fragment("random()"))
           |> unquote(repo).all(options)
         end
-
-        @doc """
-        Takes an `#{unquote(source)}` and deletes it from the database.
-        """
-        @spec unquote(:"delete_#{singular}")(unquote(source).t()) ::
-                {:ok, unquote(source).t()}
-                | {:error, Ecto.Changeset.t(unquote(source).t())}
-        def unquote(:"delete_#{singular}")(record, options \\ [])
-            when is_struct(record, unquote(source)),
-            do: unquote(repo).delete(record, options)
-
-        @doc """
-        Takes an `#{unquote(source)}` and deletes it from the database.
-
-        If the row can't be found or constraints prevent you from deleting the row, this will raise an exception.
-        """
-        @spec unquote(:"delete_#{singular}!")(unquote(source).t()) ::
-                unquote(source).t()
-        def unquote(:"delete_#{singular}!")(record, options \\ [])
-            when is_struct(record, unquote(source)),
-            do: unquote(repo).delete!(record, options)
       end,
       if pubsub do
         quote do

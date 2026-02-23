@@ -6,7 +6,6 @@ Creates a common set of interface APIs for ecto-based models. By including this 
 - `count_accounts/0` returns the total nuber of records
 - `get_account/1` returns a singular record by it's primary key
 - `random_account/0` returns a random record for a schema
-- `delete_account/1` deletes a record from the database
 
 and many more.
 

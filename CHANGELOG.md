@@ -1,9 +1,15 @@
 # Changelog
 
+## 8.0.0
+
+- [breaking] Finally removing the `delete_*/1` functions as they follow the same principle as the `create_*/1` and `update_*/2`
+- [bug] We technically allow anything to be an event, so the spec should match
+
 ## 7.0.0
 
-- [breaking] I've decided the `_by() functions are, both read and write, largely a mistake. So I'm going to remove them.
+- [breaking] I've decided the `list_*_by()` and `get_*_by()` functions are, both read and write, largely a mistake. So I'm going to remove them.
 - [breaking] The scope pattern in Phoenix 1.19 is really good, so I'm going to adopt that.
+- [breaking] Removed the `create_*/1` and `update_*/2` functionality as they should be done inhouse
 
 ## 6.1.1
 

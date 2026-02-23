@@ -223,7 +223,7 @@ defmodule EctoInterface.PubSub do
           #{__MODULE__}.subscribe_to_#{unquote(singular)}(#{unquote(singular)}.id)
       """
       @spec unquote(:"broadcast_#{plural}_event")(
-              atom() | String.t(),
+              any(),
               atom() | integer() | String.t(),
               Keyword.t() | nil
             ) :: :ok | {:error, term()}
@@ -241,6 +241,8 @@ defmodule EctoInterface.PubSub do
     end
   end
 
+  @spec broadcast_plural_event(module(), atom(), any(), atom(), atom(), Keyword.t()) ::
+          :ok | {:error, term()}
   def broadcast_plural_event(module, pubsub, event, key, plural, singular, options \\ []) do
     if Keyword.keyword?(options) && Enum.any?(options) do
       Phoenix.PubSub.broadcast(
